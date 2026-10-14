@@ -1,7 +1,8 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import CamilleIdle from './CamilleIdle'
 import ForegroundDuo from './ForegroundDuo'
+import KioskVideoPanel from './KioskVideoPanel'
 import './AdventureScene.css'
 
 // Painting order is independent of reveal timing: the ground can arrive last
@@ -27,11 +28,13 @@ const layers = [
 ]
 const lamps=[{x:68,y:216},{x:514,y:154},{x:802,y:207},{x:1116,y:207}]
 
-export default function AdventureScene({hideCharacter=false}) {
+export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0}) {
   const reduced=useReducedMotion()
+  const [cameraReady,setCameraReady]=useState(false)
   const id=useId().replaceAll(':','')
-  return <section className="adventure-scene" aria-label="Camille’s Paris fashion adventure"><div className="adventure-stage">
-    <svg className="adventure-panorama" viewBox="0 0 1600 900" role="img" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
+  return <section className="adventure-scene" aria-label={focused ? 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
+    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}} onAnimationStart={()=>setCameraReady(false)} onAnimationComplete={()=>setCameraReady(focused)}>
+    <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
         {layers.map((layer,index)=><mask key={layer.name} id={`${id}-${layer.name}`} maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900"><path d={layer.path} fill="white"/>{layers.slice(index+1).map(front=><path key={front.name} d={front.path} fill="black"/>)}</mask>)}
         <radialGradient id={`${id}-lamp-light`}><stop offset="0" stopColor="#fff6b1" stopOpacity=".85"/><stop offset="1" stopColor="#fff6b1" stopOpacity="0"/></radialGradient>
@@ -40,7 +43,10 @@ export default function AdventureScene({hideCharacter=false}) {
       <motion.g initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced?0:1.02,duration:reduced?0:.1}}><image href="/paris-adventure.png" width="1600" height="900" preserveAspectRatio="none"/></motion.g>
       <ForegroundDuo reduced={reduced}/>
       {lamps.map((lamp,index)=><motion.ellipse key={index} className="lamp-glow" cx={lamp.x} cy={lamp.y} rx="39" ry="49" fill={`url(#${id}-lamp-light)`} initial={{opacity:0}} animate={reduced?{opacity:.24}:{opacity:[.18,.18,.5,.22,.4,.18]}} transition={reduced?{duration:0}:{delay:1.2+index*.17,duration:5.5+index*.3,repeat:Infinity,ease:'easeInOut'}}/>)}
+      {!focused&&onSelectKiosk&&<g className="kiosk-hit-target" role="button" tabIndex="0" aria-label="Zoom in to machine 01" onClick={onSelectKiosk} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();onSelectKiosk()}}}><rect x="448" y="334" width="163" height="354" rx="24" fill="transparent"/></g>}
     </svg>
     <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter}/></div>
+    </motion.div>
+    {focused&&cameraReady&&<KioskVideoPanel key={videoReplay}/>}
   </div></section>
 }

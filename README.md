@@ -8,6 +8,8 @@ Camille’s redesigned profile uses a generated smiling head-and-shoulders portr
 
 The third slide uses a single camera flash to change the photographic portrait into a cartoon head-and-shoulders portrait inside the same frame. Camille winks before jumping out and landing in the Paris scene. Seventeen masked regions reveal quickly in depth order: clouds and bridge, lamps, cupboards and cashier, three kiosks, foreground Duo and displays and sign, then the ground. Camille cycles through a wave/wink, neutral smile and relaxed pose; lamps glow gently and the separate foreground Duo arm waves. Click the profile or use Enter/Space/ArrowRight to enter her world; Previous slide or ArrowLeft moves back one slide. Reduced-motion settings skip the transformation and looping animations.
 
+The fourth slide zooms into machine 01, then opens a right-hand panel titled “1. Personalized proficiency”. The uploaded clip is served as a browser-compatible H.264 MP4 with its audio track removed; playback starts automatically, stays muted, plays inline and loops. Use the footer or select machine 01 to enter, Previous slide to zoom back out, or Replay the video to restart the clip.
+
 ## Development
 
 Requires Node.js 24 and npm.
