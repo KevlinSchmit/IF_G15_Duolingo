@@ -6,7 +6,7 @@ The opening slide displays a placeholder TEXT title and text text subtitles. A l
 
 Camille’s redesigned profile uses a generated smiling head-and-shoulders portrait, oversized rounded typography, and a bright Duolingo green background. Fashion and Paris illustrations, the words ‘outfits’ and ‘paris’, and an age badge enter with a spring animation and float gently. Reduced-motion preferences disable floating. Use the replay button to repeat the entrance or the fullscreen button to present.
 
-The third slide transforms Camille through a soft flash, pops the cartoon character out of her portrait, then assembles the Paris fashion setting in staggered regions. Camille lands in the foreground. Click the profile or use Enter/Space/ArrowRight to enter her world; the previous-slide button or ArrowLeft moves back one slide. Reduced-motion settings skip the transformation.
+The third slide uses a single camera flash to change the photographic portrait into a cartoon head-and-shoulders portrait inside the same frame. Camille winks before jumping out and landing in the Paris scene. Seventeen masked regions reveal quickly in depth order: clouds and bridge, lamps, cupboards and cashier, three kiosks, foreground Duo and displays and sign, then the ground. Camille cycles through a wave/wink, neutral smile and relaxed pose; lamps glow gently and the separate foreground Duo arm waves. Click the profile or use Enter/Space/ArrowRight to enter her world; Previous slide or ArrowLeft moves back one slide. Reduced-motion settings skip the transformation and looping animations.
 
 ## Development
 
