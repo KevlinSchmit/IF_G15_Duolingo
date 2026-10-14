@@ -32,6 +32,14 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,ga
     video.play().catch(()=>setNeedsPlay(true))
   },[ready,showGallery])
   return <motion.aside className="kiosk-video-panel" aria-labelledby={titleId} initial={reduced?{opacity:0,y:'-50%'}:{opacity:0,x:45,y:'-50%',scale:.94}} animate={{opacity:1,x:0,y:'-50%',scale:1}} transition={{duration:reduced?.1:.38,type:'spring',bounce:.15}} exit={{opacity:0,x:15}} onAnimationComplete={()=>setReady(true)}>
+    <AnimatePresence>
+      {demo==='scan'&&!showGallery&&<motion.div className="nfc-sticker-group" key="nfc-phone" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.18}}>
+        <span className="nfc-sticker-label">NFC tag<svg viewBox="0 0 45 25" fill="none" aria-hidden="true"><path d="M3 7C14 2 25 3 37 17M28 16l10 2-2-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
+        <motion.figure className="nfc-phone-sticker" initial={reduced?false:{opacity:0,scale:.7,rotate:0,y:12}} animate={{opacity:1,scale:1,rotate:10,y:0}} transition={{delay:reduced?0:.18,duration:reduced?0:.45,type:'spring',bounce:.28}}>
+          <img src="/nfc-phone-sticker.png" alt="Phone showing a 5:00 timer and a prompt to tap the NFC tag on clothes"/>
+        </motion.figure>
+      </motion.div>}
+    </AnimatePresence>
     <h2 id={titleId}>{content.title}</h2>
     <div className="proficiency-video-frame">
       <AnimatePresence mode="wait" initial={false}>
