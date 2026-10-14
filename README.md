@@ -14,7 +14,9 @@ The fifth slide changes the panel to “2. Find Clothing” and automatically pl
 
 The sixth slide shows “3. Scan the Cloth” and automatically plays the third uploaded clip silently once. It has no audio track and does not loop: playback ends on the last frame. See scan results continues to the image sequence; Previous slide returns to Find Clothing.
 
-The seventh slide keeps the “3. Scan the Cloth” panel in place and fades the video into three screenshot assets recreated from the supplied UI references. They spring in sequentially, then fan out into a left-to-right row with independent rounded blue borders; the third image stretches to fill its border. Replay the images repeats the sequence; Previous slide returns to the scan video. Reduced-motion preferences show the final row directly.
+The seventh slide keeps the “3. Scan the Cloth” panel in place and fades the video into three screenshot assets recreated from the supplied UI references. They spring in sequentially, then fan out into a left-to-right row with independent rounded blue borders; the third image stretches to fill its border. Click anywhere or choose Sharing Outfit to continue to the final slide; Previous slide returns to the scan video. Reduced-motion preferences show the final row directly.
+
+The eighth and final slide opens “4. Sharing Outfit”. The supplied clip is cropped by 98 pixels at the top and 98 pixels at the bottom (720 × 1084), preserving the full app UI and buttons. It plays automatically, silently and loops beside the Paris Fashion Challenge screenshot recreated from the supplied image, in separate rounded blue borders. Both portrait cards remain side by side on mobile. Replay the video restarts the clip; Previous slide returns to the three scan-result screens.
 
 ## Development
 
