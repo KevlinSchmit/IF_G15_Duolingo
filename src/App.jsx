@@ -73,23 +73,24 @@ export default function App() {
     setTransformOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
   },[page,reduced])
   const startKiosk = useCallback(()=>{if(!transitionLock.current&&page==='adventure')setPage('proficiency')},[page])
-  const goBack = useCallback(() => {if (!transitionLock.current) {setPage(current=>current==='proficiency' ? 'adventure' : current==='adventure' ? 'camille' : 'opening')}}, [])
+  const startClothing=useCallback(()=>{if(!transitionLock.current&&page==='proficiency')setPage('clothing')},[page])
+  const goBack = useCallback(() => {if (!transitionLock.current) {setPage(current=>current==='clothing' ? 'proficiency' : current==='proficiency' ? 'adventure' : current==='adventure' ? 'camille' : 'opening')}}, [])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'proficiency') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startTransformation();else startKiosk()}
+      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'clothing') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startTransformation();else if(page==='adventure')startKiosk();else startClothing()}
       if (event.key === 'ArrowLeft') goBack()
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
-  }, [page,startJourney,startTransformation,startKiosk,goBack])
+  }, [page,startJourney,startTransformation,startKiosk,startClothing,goBack])
   const [fullscreen,setFullscreen] = useState(false)
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin}>
+  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin}>
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={startJourney} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
@@ -120,10 +121,10 @@ export default function App() {
         <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
         <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
-    </section></motion.div> : <motion.div key="adventure" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene hideCharacter={!!transformOrigin} focused={page==='proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
+    </section></motion.div> : <motion.div key="adventure" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'} demo={page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
-    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={()=>page === 'opening' ? startJourney() : page === 'camille' ? startTransformation() : page === 'adventure' ? startKiosk() : setVideoReplay(videoReplay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : 'Replay the video'} <span aria-hidden="true">{page === 'proficiency' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : '04'} <span>/ 04</span></span></footer>
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={()=>page === 'opening' ? startJourney() : page === 'camille' ? startTransformation() : page === 'adventure' ? startKiosk() : page==='proficiency' ? startClothing() : setVideoReplay(videoReplay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Find Clothing' : 'Replay the video'} <span aria-hidden="true">{page === 'clothing' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : page==='proficiency' ? '04' : '05'} <span>/ 05</span></span></footer>
   </main>
 }
