@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import './App.css'
 import FrenchDuo from './FrenchDuo'
+import SceneTransition from './SceneTransition'
 
 function Flowers() {
   return <svg viewBox="0 0 170 190" fill="none" aria-hidden="true">
@@ -45,33 +46,48 @@ function Floating({className, children, delay = 0, rotation = 0, reduced}) {
     <motion.div className="float-inner" animate={reduced ? {} : {y:[0,-10,0],rotate:[0,2,0]}} transition={{duration:4.5+delay,repeat:Infinity,delay,ease:'easeInOut'}}>{children}</motion.div>
   </motion.div>
 }
+function BlastText({ text, blast, offset = 0 }) {
+  return [...text].map((letter,index) => <motion.span className="blast-letter" key={index} initial={false} animate={blast ? {x:(index % 2 ? 1 : -1)*(700+index*100),y:((index+offset)%3-1)*750,rotate:(index%2 ? 1 : -1)*(100+index*35),opacity:0} : {x:0,y:0,rotate:0,opacity:1}} transition={{duration:.55,ease:'easeOut'}}>{letter}</motion.span>)
+}
 export default function App() {
   const reduced = useReducedMotion()
   const [replay,setReplay] = useState(0)
   const [page,setPage] = useState('opening')
+  const [transitionOrigin,setTransitionOrigin] = useState(null)
+  const [blast,setBlast] = useState(false)
+  const duoRef = useRef(null)
+  const transitionLock = useRef(false)
+  const startJourney = useCallback(() => {
+    if (transitionLock.current || page !== 'opening') return
+    if (reduced) {setPage('camille');return}
+    transitionLock.current = true
+    const rect = duoRef.current.querySelector('svg').getBoundingClientRect()
+    setTransitionOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
+  }, [page,reduced])
+  const goBack = useCallback(() => {if (!transitionLock.current) {setBlast(false);setPage('opening')}}, [])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page === 'opening') {event.preventDefault();setPage('camille')}
-      if (event.key === 'ArrowLeft') setPage('opening')
+      if (['ArrowRight','Enter',' '].includes(event.key) && page === 'opening') {event.preventDefault();startJourney()}
+      if (event.key === 'ArrowLeft') goBack()
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
-  }, [page])
+  }, [page,startJourney,goBack])
   const [fullscreen,setFullscreen] = useState(false)
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className="profile-page">
+  return <main className={`profile-page ${transitionOrigin ? 'is-transitioning' : ''}`} aria-busy={!!transitionOrigin}>
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
-    {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={()=>setPage('camille')} initial={{opacity:0}} animate={{opacity:1}} exit={reduced ? {opacity:0} : {opacity:0,x:-60}} transition={{duration:reduced ? .1 : .45}}>
-      <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}>BONJOUR !</motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}>TEXT<span>.</span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>text text</h2><p>text text</p></motion.div></div>
+    {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={startJourney} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .45}}>
+      <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}><BlastText text="BONJOUR !" blast={blast}/></motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}><BlastText text="TEXT" blast={blast}/><span><BlastText text="." blast={blast} offset={2}/></span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2><BlastText text="text text" blast={blast}/></h2><p><BlastText text="text text" blast={blast} offset={1}/></p></motion.div></div>
       <div className="opening-decoration" aria-hidden="true"><Spark/></div>
-      <div className="opening-duo"><span className="duo-greeting">salut !</span><FrenchDuo/></div>
-    </motion.section> : <motion.div key="camille" initial={reduced ? false : {opacity:0,x:60}} animate={{opacity:1,x:0}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .45}}><section key={replay} className="profile-scene" aria-label="Meet Camille">
+      <div ref={duoRef} className={`opening-duo ${transitionOrigin ? 'duo-in-transition' : ''}`}><span className="duo-greeting">salut !</span><FrenchDuo/></div>
+    </motion.section> : <motion.div key="camille" initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .45}}><section key={replay} className="profile-scene" aria-label="Meet Camille">
       <div className="headline-block">
         <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
         <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
@@ -97,6 +113,7 @@ export default function App() {
       </div>
     </section></motion.div>}
     </AnimatePresence>
-    <footer><button className="back-button" onClick={()=>setPage('opening')} disabled={page === 'opening'} aria-label="Back to opening">←</button><button onClick={()=>page === 'opening' ? setPage('camille') : setReplay(replay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : 'Replay the introduction'} <span aria-hidden="true">{page === 'opening' ? '→' : '↻'}</span></button><span className="page-number">{page === 'opening' ? '01' : '02'} <span>/ 02</span></span></footer>
+    {transitionOrigin && <SceneTransition origin={transitionOrigin} onImpact={()=>setBlast(true)} onReveal={()=>setPage('camille')} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin} aria-label="Back to opening">←</button><button disabled={!!transitionOrigin} onClick={()=>page === 'opening' ? startJourney() : setReplay(replay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : 'Replay the introduction'} <span aria-hidden="true">{page === 'opening' ? '→' : '↻'}</span></button><span className="page-number">{page === 'opening' ? '01' : '02'} <span>/ 02</span></span></footer>
   </main>
 }
