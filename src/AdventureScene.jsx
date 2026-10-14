@@ -32,7 +32,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
   const reduced=useReducedMotion()
   const [cameraReady,setCameraReady]=useState(false)
   const id=useId().replaceAll(':','')
-  return <section className="adventure-scene" aria-label={focused ? demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
+  return <section className="adventure-scene" aria-label={focused ? demo==='scan' ? 'Scan the Cloth video slide' : demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
     <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%',filter:'blur(2px)'}:{scale:1,x:'0%',y:'0%',filter:'blur(0px)'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}} onAnimationStart={()=>setCameraReady(false)} onAnimationComplete={()=>setCameraReady(focused)}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
