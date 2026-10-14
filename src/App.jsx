@@ -1,70 +1,54 @@
-import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import './App.css'
 
-const asset = '/camille-characters.png'
+function Shirt() {
+  return <svg viewBox="0 0 160 150" fill="none" aria-hidden="true"><path d="m49 22-36 27 23 36 17-10v62h61V75l17 10 23-36-36-27-19 11H68L49 22Z" fill="#FF9600"/><path d="M62 25q18 28 38 0" stroke="#FFD667" strokeWidth="12"/><path d="M58 99h47" stroke="#FFB93D" strokeWidth="10" strokeLinecap="round"/><path d="m26 46 17 25M119 71l17-25" stroke="#FFB93D" strokeWidth="9" strokeLinecap="round"/></svg>
+}
+function Tower() {
+  return <svg viewBox="0 0 160 200" fill="none" aria-hidden="true"><path d="M80 14v21M69 35h22M78 35c-2 43-16 95-48 142h100C98 130 84 78 82 35" stroke="#FFF" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round"/><path d="M53 114h54M38 151h84M57 177c1-35 45-35 46 0M62 76h36" stroke="#FFF" strokeWidth="10" strokeLinecap="round"/><path d="m58 115 43 35M102 115l-44 35" stroke="#FFF" strokeWidth="7"/><path d="M20 184h120" stroke="#FFF" strokeWidth="12" strokeLinecap="round"/></svg>
+}
+function Spark({className}) {return <svg className={className} viewBox="0 0 60 60" aria-hidden="true"><path d="M30 0c3 21 9 27 30 30-21 3-27 9-30 30C27 39 21 33 0 30 21 27 27 21 30 0Z" fill="currentColor"/></svg>}
 
+function Floating({className, children, delay = 0, rotation = 0, reduced}) {
+  return <motion.div className={`floating ${className}`} initial={reduced ? false : {opacity:0,scale:.65,y:30,rotate:rotation-10}} animate={{opacity:1,scale:1,y:0,rotate:rotation}} transition={{delay:reduced ? 0 : delay,duration:.6,type:'spring',bounce:.35}}>
+    <motion.div className="float-inner" animate={reduced ? {} : {y:[0,-10,0],rotate:[0,2,0]}} transition={{duration:4.5+delay,repeat:Infinity,delay,ease:'easeInOut'}}>{children}</motion.div>
+  </motion.div>
+}
 export default function App() {
-  const [scene, setScene] = useState('real')
-  const [transition, setTransition] = useState(null)
-  const [loaded, setLoaded] = useState(false)
   const reduced = useReducedMotion()
-  const cartoon = scene === 'duo'
-  const advance = () => {
-    if (transition || !loaded) return
-    setTransition('cover')
+  const [replay,setReplay] = useState(0)
+  const [fullscreen,setFullscreen] = useState(false)
+  const enterFullscreen = async () => {
+    if (document.fullscreenElement) await document.exitFullscreen()
+    else await document.documentElement.requestFullscreen?.()
+    setFullscreen(Boolean(document.fullscreenElement))
   }
-  useEffect(() => {
-    const image = new Image()
-    image.onload = () => setLoaded(true)
-    image.src = asset
-  }, [])
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.target.closest('button')) return
-      if ([' ', 'Enter', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault()
-        if (!transition && loaded) setTransition('cover')
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [transition, loaded])
-
-  return <main className={cartoon ? 'presentation cartoon-scene' : 'presentation'} onClick={advance}>
-    <header><span className="brand">duolingo<span> ✦</span></span><span className="chapter">A LITTLE FRENCH. A BIG DREAM.</span><span className="scene-count">{cartoon ? '02' : '01'} <span>/ 02</span></span></header>
-    <div className="ambient ambient-one" aria-hidden="true"/><div className="ambient ambient-two" aria-hidden="true"/>
-    <section className="intro" aria-label={cartoon ? 'Camille as a Duolingo character' : 'Meet Camille'}>
-      <div className="portrait-stage">
-        <div className="portrait-orbit" aria-hidden="true"/>
-        <motion.span className="floating-spark spark-one" aria-hidden="true" animate={reduced ? {} : {rotate:[-10,10,-10], y:[0,-12,0]}} transition={{duration:4,repeat:Infinity}}>✦</motion.span>
-        <span className="floating-spark spark-two" aria-hidden="true">✧</span>
-        <AnimatePresence mode="wait">
-          <motion.div key={scene} className={`character character-${scene}`} role="img" aria-label={cartoon ? 'Smiling cartoon Camille in her cream sweater and beige trousers' : 'Smiling Camille with brown hair, a cream sweater and beige trousers'} style={{backgroundImage:`url(${asset})`}} initial={{opacity:0,scale:.94,y:20}} animate={{opacity:loaded ? 1 : 0,scale:1,y:0}} exit={{opacity:0}} transition={{duration:reduced ? 0 : .55}}/>
-        </AnimatePresence>
-        <motion.div className="portrait-label" key={`label-${scene}`} initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:.2}}><span>{cartoon ? '✦' : '♡'}</span>{cartoon ? 'Same Camille. New adventure.' : 'A dreamer, with a destination.'}</motion.div>
+  return <main className="profile-page">
+    <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
+    <section key={replay} className="profile-scene" aria-label="Meet Camille">
+      <div className="headline-block">
+        <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
+        <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
+        <motion.p className="profile-description" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .6}}>19 years old. A fashion lover.<br/>And a little obsessed with Paris.</motion.p>
+        <motion.div className="profile-caption" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .9}}><span className="french-flag"><i/><i/><i/></span><span>Next stop? France.</span></motion.div>
       </div>
-      <div className="intro-copy">
-        <p className="eyebrow"><span/> {cartoon ? 'HER LANGUAGE JOURNEY BEGINS' : 'EVERY JOURNEY STARTS WITH SOMEONE'}</p>
-        <motion.h1 key={`title-${scene}`} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} transition={{duration:.5}}>Meet<br/><span>Camille<span className="title-dot">.</span></span></motion.h1>
-        <p className="lead">{cartoon ? 'One dream. A whole new world of words.' : 'A love for fashion. A dream of France.'}</p>
-        <div className="details">
-          <div><span className="detail-icon age-icon" aria-hidden="true">19</span><p><span>A LITTLE ABOUT HER</span>19 years old</p></div>
-          <div><span className="detail-icon fashion-icon" aria-hidden="true">♡</span><p><span>HER PASSION</span>Loves fashion</p></div>
-          <div><span className="detail-icon france-icon" aria-hidden="true"><i/><i/><i/></span><p><span>HER NEXT CHAPTER</span>Wants to go to France</p></div>
-        </div>
+      <div className="portrait-world">
+        <div className="portrait-backdrop"/>
+        <motion.div className="portrait-frame" initial={reduced ? false : {opacity:0,scale:.85,rotate:-5}} animate={{opacity:1,scale:1,rotate:-5}} transition={{duration:.8,type:'spring',bounce:.2}}>
+          <img src="/camille-portrait.png" alt="Camille smiling, with brown hair and bangs, wearing a cream sweater"/>
+          <div className="photo-caption"><span>c’est Camille !</span><span className="caption-heart">♥</span></div>
+        </motion.div>
+        <Floating className="outfits-word" delay={.45} rotation={-12} reduced={reduced}>outfits</Floating>
+        <Floating className="paris-word" delay={.75} rotation={10} reduced={reduced}>paris<span>♡</span></Floating>
+        <Floating className="shirt-sticker" delay={.7} rotation={-15} reduced={reduced}><Shirt/></Floating>
+        <Floating className="paris-sticker" delay={.9} rotation={12} reduced={reduced}><div className="tower-card"><Tower/><span>MON RÊVE</span></div></Floating>
+        <Floating className="age-sticker" delay={1.1} rotation={9} reduced={reduced}><span>19<span>YEARS YOUNG</span></span></Floating>
+        <Floating className="spark-yellow" delay={.6} reduced={reduced}><Spark/></Floating>
+        <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
+        <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
     </section>
-    <footer><div className="scene-track"><span className="selected"/><span className={cartoon ? 'selected' : ''}/></div><button onClick={(event) => {event.stopPropagation();advance()}} disabled={!!transition || !loaded} className="continue">{!loaded ? 'Preparing Camille…' : cartoon ? 'Click anywhere to meet her again' : 'Click anywhere to start her journey'}<span aria-hidden="true">{cartoon ? '↺' : '→'}</span></button><span className="footer-note">{cartoon ? 'BONJOUR, CAMILLE !' : 'LET’S MEET OUR LEARNER'}</span></footer>
-    <div className="sr-only" aria-live="polite">{transition ? 'Duo is transforming Camille.' : cartoon ? 'Camille is now a Duolingo-style character.' : 'Camille’s introduction. Click anywhere or press Enter to transform her.'}</div>
-    {transition && <motion.div className="transition-curtain" aria-hidden="true" initial={{x:'-105%'}} animate={{x:transition === 'cover' ? '0%' : '105%'}} transition={{duration:reduced ? .1 : .85,ease:[.65,0,.35,1]}} onAnimationComplete={() => {
-      if (transition === 'cover') {setScene(cartoon ? 'real' : 'duo');setTransition('reveal')}
-      else setTransition(null)
-    }}>
-      <div className="flag-band flag-blue"/><div className="flag-band flag-white"/><div className="flag-band flag-red"/>
-      <div className="transition-message"><span>UN PETIT PAS…</span><strong>A whole new adventure.</strong></div>
-      <motion.div className="cycling-duo" style={{backgroundImage:`url(${asset})`}} animate={reduced ? {} : {y:[0,-8,0],rotate:[-3,2,-3]}} transition={{duration:.35,repeat:Infinity}}/>
-      <span className="speed-line speed-one"/><span className="speed-line speed-two"/><span className="speed-line speed-three"/>
-    </motion.div>}
+    <footer><span className="story-label">HER STORY STARTS HERE</span><button onClick={()=>setReplay(replay+1)} className="replay-button">Replay the introduction <span aria-hidden="true">↻</span></button><span className="page-number">01 <span>/ CAMILLE</span></span></footer>
   </main>
 }

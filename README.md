@@ -2,7 +2,7 @@
 
 An animated Duolingo-inspired presentation built with React, Vite, and Motion.
 
-Camille’s introduction includes a generated smiling portrait, her age (19), a love of fashion, and her dream of visiting France. Click anywhere or press Enter, Space, or ArrowRight to reveal a matching cartoon character through a French-colour cycling-Duo transition. Repeat to return to the introduction.
+Camille’s redesigned profile uses a generated smiling head-and-shoulders portrait, oversized rounded typography, and a bright Duolingo green background. Fashion and Paris illustrations, the words ‘outfits’ and ‘paris’, and an age badge enter with a spring animation and float gently. Reduced-motion preferences disable floating. Use the replay button to repeat the entrance or the fullscreen button to present.
 
 ## Development
 
