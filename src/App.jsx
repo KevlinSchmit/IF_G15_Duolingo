@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import './App.css'
+import FrenchDuo from './FrenchDuo'
 
 function Flowers() {
   return <svg viewBox="0 0 170 190" fill="none" aria-hidden="true">
@@ -47,6 +48,16 @@ function Floating({className, children, delay = 0, rotation = 0, reduced}) {
 export default function App() {
   const reduced = useReducedMotion()
   const [replay,setReplay] = useState(0)
+  const [page,setPage] = useState('opening')
+  useEffect(() => {
+    const onKey = event => {
+      if (event.target.closest('button')) return
+      if (['ArrowRight','Enter',' '].includes(event.key) && page === 'opening') {event.preventDefault();setPage('camille')}
+      if (event.key === 'ArrowLeft') setPage('opening')
+    }
+    window.addEventListener('keydown',onKey)
+    return () => window.removeEventListener('keydown',onKey)
+  }, [page])
   const [fullscreen,setFullscreen] = useState(false)
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
@@ -55,7 +66,12 @@ export default function App() {
   }
   return <main className="profile-page">
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
-    <section key={replay} className="profile-scene" aria-label="Meet Camille">
+    <AnimatePresence mode="wait">
+    {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={()=>setPage('camille')} initial={{opacity:0}} animate={{opacity:1}} exit={reduced ? {opacity:0} : {opacity:0,x:-60}} transition={{duration:reduced ? .1 : .45}}>
+      <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}>BONJOUR !</motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}>TEXT<span>.</span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>text text</h2><p>text text</p></motion.div></div>
+      <div className="opening-decoration" aria-hidden="true"><Spark/></div>
+      <div className="opening-duo"><span className="duo-greeting">salut !</span><FrenchDuo/></div>
+    </motion.section> : <motion.div key="camille" initial={reduced ? false : {opacity:0,x:60}} animate={{opacity:1,x:0}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .45}}><section key={replay} className="profile-scene" aria-label="Meet Camille">
       <div className="headline-block">
         <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
         <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
@@ -79,7 +95,8 @@ export default function App() {
         <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
         <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
-    </section>
-    <footer><span className="story-label">HER STORY STARTS HERE</span><button onClick={()=>setReplay(replay+1)} className="replay-button">Replay the introduction <span aria-hidden="true">↻</span></button><span className="page-number">01 <span>/ CAMILLE</span></span></footer>
+    </section></motion.div>}
+    </AnimatePresence>
+    <footer><button className="back-button" onClick={()=>setPage('opening')} disabled={page === 'opening'} aria-label="Back to opening">←</button><button onClick={()=>page === 'opening' ? setPage('camille') : setReplay(replay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : 'Replay the introduction'} <span aria-hidden="true">{page === 'opening' ? '→' : '↻'}</span></button><span className="page-number">{page === 'opening' ? '01' : '02'} <span>/ 02</span></span></footer>
   </main>
 }
