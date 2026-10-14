@@ -75,23 +75,24 @@ export default function App() {
   const startKiosk = useCallback(()=>{if(!transitionLock.current&&page==='adventure')setPage('proficiency')},[page])
   const startClothing=useCallback(()=>{if(!transitionLock.current&&page==='proficiency')setPage('clothing')},[page])
   const startScan=useCallback(()=>{if(!transitionLock.current&&page==='clothing')setPage('scan')},[page])
-  const goBack = useCallback(() => {if (!transitionLock.current) {setPage(current=>current==='scan' ? 'clothing' : current==='clothing' ? 'proficiency' : current==='proficiency' ? 'adventure' : current==='adventure' ? 'camille' : 'opening')}}, [])
+  const startScanResults=useCallback(()=>{if(!transitionLock.current&&page==='scan')setPage('scan-results')},[page])
+  const goBack = useCallback(() => {if (!transitionLock.current) {setPage(current=>current==='scan-results' ? 'scan' : current==='scan' ? 'clothing' : current==='clothing' ? 'proficiency' : current==='proficiency' ? 'adventure' : current==='adventure' ? 'camille' : 'opening')}}, [])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'scan') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startTransformation();else if(page==='adventure')startKiosk();else if(page==='proficiency')startClothing();else startScan()}
+      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'scan-results') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startTransformation();else if(page==='adventure')startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else startScanResults()}
       if (event.key === 'ArrowLeft') goBack()
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
-  }, [page,startJourney,startTransformation,startKiosk,startClothing,startScan,goBack])
+  }, [page,startJourney,startTransformation,startKiosk,startClothing,startScan,startScanResults,goBack])
   const [fullscreen,setFullscreen] = useState(false)
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin}>
+  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan'||page === 'scan-results' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin}>
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={startJourney} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
@@ -122,10 +123,10 @@ export default function App() {
         <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
         <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
-    </section></motion.div> : <motion.div key="adventure" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'} demo={page==='scan'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
+    </section></motion.div> : <motion.div key="adventure" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'} showGallery={page==='scan-results'} demo={page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
-    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={()=>page === 'opening' ? startJourney() : page === 'camille' ? startTransformation() : page === 'adventure' ? startKiosk() : page==='proficiency' ? startClothing() : page==='clothing' ? startScan() : setVideoReplay(videoReplay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Find Clothing' : page==='clothing' ? 'Scan the Cloth' : 'Replay the video'} <span aria-hidden="true">{page === 'scan' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : page==='proficiency' ? '04' : page==='clothing' ? '05' : '06'} <span>/ 06</span></span></footer>
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={()=>page === 'opening' ? startJourney() : page === 'camille' ? startTransformation() : page === 'adventure' ? startKiosk() : page==='proficiency' ? startClothing() : page==='clothing' ? startScan() : page==='scan' ? startScanResults() : setVideoReplay(videoReplay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Find Clothing' : page==='clothing' ? 'Scan the Cloth' : page==='scan' ? 'See scan results' : 'Replay the images'} <span aria-hidden="true">{page === 'scan-results' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : page==='proficiency' ? '04' : page==='clothing' ? '05' : page==='scan' ? '06' : '07'} <span>/ 07</span></span></footer>
   </main>
 }

@@ -28,11 +28,11 @@ const layers = [
 ]
 const lamps=[{x:68,y:216},{x:514,y:154},{x:802,y:207},{x:1116,y:207}]
 
-export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency'}) {
+export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false}) {
   const reduced=useReducedMotion()
   const [cameraReady,setCameraReady]=useState(false)
   const id=useId().replaceAll(':','')
-  return <section className="adventure-scene" aria-label={focused ? demo==='scan' ? 'Scan the Cloth video slide' : demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
+  return <section className="adventure-scene" aria-label={showGallery ? 'Scan the Cloth result screens' : focused ? demo==='scan' ? 'Scan the Cloth video slide' : demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
     <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%',filter:'blur(2px)'}:{scale:1,x:'0%',y:'0%',filter:'blur(0px)'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}} onAnimationStart={()=>setCameraReady(false)} onAnimationComplete={()=>setCameraReady(focused)}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
@@ -47,6 +47,6 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
     </svg>
     <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter}/></div>
     </motion.div>
-    <AnimatePresence mode="wait">{focused&&cameraReady&&<KioskVideoPanel key={`${demo}-${videoReplay}`} demo={demo}/>}</AnimatePresence>
+    <AnimatePresence mode="wait">{focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }

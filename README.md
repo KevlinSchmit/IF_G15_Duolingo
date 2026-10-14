@@ -12,7 +12,9 @@ The fourth slide zooms into machine 01, then opens a right-hand panel titled “
 
 The fifth slide changes the panel to “2. Find Clothing” and automatically plays the second uploaded clip without sound. Both video slides subtly blur only the Paris scene behind the panel. The previous video is unmounted during panel changes; return with Previous slide or restart the current clip with Replay the video on the final slide.
 
-The sixth slide shows “3. Scan the Cloth” and automatically plays the third uploaded clip silently once. It has no audio track and does not loop: playback ends on the last frame. Replay the video restarts it manually; Previous slide returns to Find Clothing.
+The sixth slide shows “3. Scan the Cloth” and automatically plays the third uploaded clip silently once. It has no audio track and does not loop: playback ends on the last frame. See scan results continues to the image sequence; Previous slide returns to Find Clothing.
+
+The seventh slide keeps the “3. Scan the Cloth” panel in place and fades the video into three screenshot assets recreated from the supplied UI references. They spring in sequentially, then fan out into a left-to-right row with independent rounded blue borders. Replay the images repeats the sequence; Previous slide returns to the scan video. Reduced-motion preferences show the final row directly.
 
 ## Development
 
