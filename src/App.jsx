@@ -69,7 +69,7 @@ export default function App() {
     if (transitionLock.current || page !== 'camille') return
     if (reduced) {setPage('adventure');return}
     transitionLock.current=true
-    const rect=portraitRef.current.querySelector('img').getBoundingClientRect()
+    const rect=portraitRef.current.querySelector('.portrait-window').getBoundingClientRect()
     setTransformOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
   },[page,reduced])
   const startKiosk = useCallback(()=>{if(!transitionLock.current&&page==='adventure')setPage('proficiency')},[page])
@@ -87,19 +87,34 @@ export default function App() {
     return () => window.removeEventListener('keydown',onKey)
   }, [page,startJourney,startTransformation,startKiosk,startClothing,startScan,startScanResults,goBack])
   const [fullscreen,setFullscreen] = useState(false)
+  useEffect(() => {
+    const sync = () => setFullscreen(Boolean(document.fullscreenElement))
+    document.addEventListener('fullscreenchange', sync)
+    return () => document.removeEventListener('fullscreenchange', sync)
+  }, [])
+  const advance = () => {
+    if (transitionLock.current) return
+    if (page==='opening') startJourney()
+    else if (page==='camille') startTransformation()
+    else if (page==='adventure') startKiosk()
+    else if (page==='proficiency') startClothing()
+    else if (page==='clothing') startScan()
+    else if (page==='scan') startScanResults()
+    else setVideoReplay(current => current+1)
+  }
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan'||page === 'scan-results' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin}>
+  return <main className={`profile-page ${transitionOrigin || transformOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan'||page === 'scan-results' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
-    {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" onClick={startJourney} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
+    {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
       <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}>BONJOUR !</motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}>TEXT<span>.</span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>text text</h2><p>text text</p></motion.div></div>
       <div className="opening-decoration" aria-hidden="true"><Spark/></div>
       <div ref={duoRef} className={`opening-duo ${transitionOrigin ? 'duo-in-transition' : ''}`}><span className="duo-greeting">salut !</span><FrenchDuo/></div>
-    </motion.section> : page === 'camille' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}><section className="profile-scene" aria-label="Meet Camille" onClick={startTransformation}>
+    </motion.section> : page === 'camille' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}><section className="profile-scene" aria-label="Meet Camille">
       <div className="headline-block">
         <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
         <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
@@ -109,7 +124,7 @@ export default function App() {
       <div className="portrait-world">
         <div className="portrait-backdrop"/>
         <motion.div ref={portraitRef} className="portrait-frame" initial={reduced ? false : {opacity:0,scale:.85,rotate:-5}} animate={{opacity:1,scale:1,rotate:-5}} transition={{duration:.8,type:'spring',bounce:.2}}>
-          <img src="/camille-portrait.png" alt="Camille smiling, with brown hair and bangs, wearing a cream sweater"/>
+          <div className="portrait-window"><img className="portrait-real" src="/camille-portrait.png" alt="Camille smiling, with brown hair and bangs, wearing a cream sweater"/><img className="portrait-cartoon portrait-neutral" src="/camille-cartoon-portrait.png" alt="" aria-hidden="true"/><img className="portrait-cartoon portrait-wink" src="/camille-cartoon-portrait-wink.png" alt="" aria-hidden="true"/><div className="portrait-flash" aria-hidden="true"/></div>
           <div className="photo-caption"><span>c’est Camille !</span><span className="caption-heart">♥</span></div>
         </motion.div>
         <Floating className="outfits-word" delay={.45} rotation={-12} reduced={reduced}>outfits</Floating>
@@ -126,7 +141,7 @@ export default function App() {
     </section></motion.div> : <motion.div key="adventure" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'} showGallery={page==='scan-results'} demo={page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
-    {transformOrigin && <CamilleTransformation origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
-    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={()=>page === 'opening' ? startJourney() : page === 'camille' ? startTransformation() : page === 'adventure' ? startKiosk() : page==='proficiency' ? startClothing() : page==='clothing' ? startScan() : page==='scan' ? startScanResults() : setVideoReplay(videoReplay+1)} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Find Clothing' : page==='clothing' ? 'Scan the Cloth' : page==='scan' ? 'See scan results' : 'Replay the images'} <span aria-hidden="true">{page === 'scan-results' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : page==='proficiency' ? '04' : page==='clothing' ? '05' : page==='scan' ? '06' : '07'} <span>/ 07</span></span></footer>
+    {transformOrigin && <CamilleTransformation portraitRef={portraitRef} origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Find Clothing' : page==='clothing' ? 'Scan the Cloth' : page==='scan' ? 'See scan results' : 'Replay the images'} <span aria-hidden="true">{page === 'scan-results' ? '↻' : '→'}</span></button><span className="page-number">{page === 'opening' ? '01' : page === 'camille' ? '02' : page==='adventure' ? '03' : page==='proficiency' ? '04' : page==='clothing' ? '05' : page==='scan' ? '06' : '07'} <span>/ 07</span></span></footer>
   </main>
 }

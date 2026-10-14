@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import CamilleIdle from './CamilleIdle'
 import ForegroundDuo from './ForegroundDuo'
@@ -31,22 +31,28 @@ const lamps=[{x:68,y:216},{x:514,y:154},{x:802,y:207},{x:1116,y:207}]
 export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false}) {
   const reduced=useReducedMotion()
   const [cameraReady,setCameraReady]=useState(false)
+  const [assembled,setAssembled]=useState(Boolean(reduced))
+  useEffect(()=>{
+    // Readiness follows navigation only; resizing/fullscreen must not hide the panel.
+    const timer=setTimeout(()=>setCameraReady(focused),focused&&!reduced?750:0)
+    return()=>clearTimeout(timer)
+  },[focused,reduced])
   const id=useId().replaceAll(':','')
   return <section className="adventure-scene" aria-label={showGallery ? 'Scan the Cloth result screens' : focused ? demo==='scan' ? 'Scan the Cloth video slide' : demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''}`}>
-    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%',filter:'blur(2px)'}:{scale:1,x:'0%',y:'0%',filter:'blur(0px)'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}} onAnimationStart={()=>setCameraReady(false)} onAnimationComplete={()=>setCameraReady(focused)}>
+    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
-        {layers.map((layer,index)=><mask key={layer.name} id={`${id}-${layer.name}`} maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900"><path d={layer.path} fill="white"/>{layers.slice(index+1).map(front=><path key={front.name} d={front.path} fill="black"/>)}</mask>)}
+        {!assembled&&layers.map((layer,index)=><mask key={layer.name} id={`${id}-${layer.name}`} maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900"><path d={layer.path} fill="white"/>{layers.slice(index+1).map(front=><path key={front.name} d={front.path} fill="black"/>)}</mask>)}
         <radialGradient id={`${id}-lamp-light`}><stop offset="0" stopColor="#fff6b1" stopOpacity=".85"/><stop offset="1" stopColor="#fff6b1" stopOpacity="0"/></radialGradient>
       </defs>
-      {layers.map(layer=><motion.g key={layer.name} className="adventure-piece" data-part={layer.name} data-delay={layer.delay} style={{transformOrigin:layer.origin}} initial={reduced?false:{opacity:0,y:layer.name==='ground'?24:35,scale:layer.name==='clouds'?.97:.92}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:layer.delay,duration:reduced?0:.3,type:'spring',bounce:.16}}><image href="/paris-adventure.png" width="1600" height="900" preserveAspectRatio="none" mask={`url(#${id}-${layer.name})`}/></motion.g>)}
-      <motion.g initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced?0:1.02,duration:reduced?0:.1}}><image href="/paris-adventure.png" width="1600" height="900" preserveAspectRatio="none"/></motion.g>
-      <ForegroundDuo reduced={reduced}/>
-      {lamps.map((lamp,index)=><motion.ellipse key={index} className="lamp-glow" cx={lamp.x} cy={lamp.y} rx="39" ry="49" fill={`url(#${id}-lamp-light)`} initial={{opacity:0}} animate={reduced?{opacity:.24}:{opacity:[.18,.18,.5,.22,.4,.18]}} transition={reduced?{duration:0}:{delay:1.2+index*.17,duration:5.5+index*.3,repeat:Infinity,ease:'easeInOut'}}/>)}
+      {!assembled&&layers.map(layer=><motion.g key={layer.name} className="adventure-piece" data-part={layer.name} data-delay={layer.delay} style={{transformOrigin:layer.origin}} initial={reduced?false:{opacity:0,y:layer.name==='ground'?24:35,scale:layer.name==='clouds'?.97:.92}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:layer.delay,duration:reduced?0:.3,type:'spring',bounce:.16}}><image href="/paris-adventure.png" width="1600" height="900" preserveAspectRatio="none" mask={`url(#${id}-${layer.name})`}/></motion.g>)}
+      <motion.g className="panorama-composite" initial={reduced?false:{opacity:0}} animate={{opacity:1}} transition={{delay:reduced?0:1.02,duration:reduced?0:.1}} onAnimationComplete={()=>setAssembled(true)}><image href="/paris-adventure.png" width="1600" height="900" preserveAspectRatio="none"/></motion.g>
+      <ForegroundDuo reduced={reduced} active={!focused}/>
+      {lamps.map((lamp,index)=><motion.ellipse key={index} className="lamp-glow" cx={lamp.x} cy={lamp.y} rx="39" ry="49" fill={`url(#${id}-lamp-light)`} initial={{opacity:0}} animate={reduced||focused?{opacity:.24}:{opacity:[.18,.18,.5,.22,.4,.18]}} transition={reduced||focused?{duration:0}:{delay:1.2+index*.17,duration:5.5+index*.3,repeat:Infinity,ease:'easeInOut'}}/>)}
       {!focused&&onSelectKiosk&&<g className="kiosk-hit-target" role="button" tabIndex="0" aria-label="Zoom in to machine 01" onClick={onSelectKiosk} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();onSelectKiosk()}}}><rect x="448" y="334" width="163" height="354" rx="24" fill="transparent"/></g>}
     </svg>
-    <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter}/></div>
-    </motion.div>
+    <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter&&!focused}/></div>
+    </div></motion.div>
     <AnimatePresence mode="wait">{focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }
