@@ -39,7 +39,8 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
     return()=>clearTimeout(timer)
   },[focused,reduced])
   const id=useId().replaceAll(':','')
-  return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan the Cloth result screens' : focused ? demo==='sharing' ? 'Sharing Outfit video and Paris Fashion Challenge' : demo==='scan' ? 'Scan the Cloth video slide' : demo==='clothing' ? 'Find Clothing video slide' : 'Machine 01: Personalized proficiency' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
+  return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? 'Share Your Outfit video and Paris Fashion Challenge' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
+    {!focused&&!showOutfit&&<h2 className="installation-heading">Inside the Installation</h2>}
     <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>

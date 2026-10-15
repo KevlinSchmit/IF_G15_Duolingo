@@ -36,10 +36,10 @@ export default function OutfitDetail({hideCharacter=false,replay=0,showLearner=f
   const active=!hideCharacter
   const hero=mobile?{x:20,y:250,width:470,height:564}:{x:140,y:130,width:540,height:690}
   return <motion.section ref={rootRef} className={`outfit-detail ${showLearner?'has-learner':''}`} aria-label="The winning Duo outfit and its French vocabulary" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.28}}>
-    <svg className="outfit-diagram" viewBox={mobile?'0 0 900 1100':'0 0 1600 900'} role="img" aria-labelledby="outfit-title outfit-description">
-      <title id="outfit-title">Le look gagnant</title>
+    <header className="outfit-intro"><h2 className="outfit-heading">Advanced Vocabulary Challenges</h2><p className="outfit-subtitle">{showLearner?'Higher proficiency unlocks advanced outfits, while streaks and rankings motivate users to keep learning.':'Higher-level players can access more complex French clothing vocabulary.'}</p></header>
+    <svg className="outfit-diagram" viewBox={mobile?'0 160 900 940':'0 100 1600 800'} role="img" aria-labelledby="outfit-title outfit-description">
+      <title id="outfit-title">French clothing vocabulary</title>
       <desc id="outfit-description">Duo’s winning French outfit: a feathered tricorne, an embroidered coat, a lace jabot and breeches. {showLearner?'English translations appear below the French labels, followed by Emma’s learning profile.':'Four French labels appear in sequence.'}</desc>
-      <text className="outfit-heading" x={mobile?65:100} y={mobile?90:80}>Le look gagnant.</text>
       <ellipse cx={mobile?255:420} cy={mobile?810:790} rx={mobile?135:215} ry={mobile?15:17} fill="#e5e5e5" opacity=".55"/>
       <g className={`outfit-duo-idle ${active&&!reduced?'outfit-duo-breathing':''} ${!active?'outfit-duo-in-flight':''}`} style={{transformOrigin:`${mobile?250:410}px ${mobile?815:820}px`}}>
         <image className="outfit-duo-target" href="/duo-winning-outfit.png" {...hero} preserveAspectRatio="xMidYMid meet"/>

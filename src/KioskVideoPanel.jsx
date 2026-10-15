@@ -2,12 +2,13 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import './KioskVideoPanel.css'
 import ScanResultGallery from './ScanResultGallery'
+import PanelNotes from './PanelNotes'
 
 const demos = {
-  sharing:{title:'4. Sharing Outfit',src:'/videos/sharing-outfit.mp4',poster:'/videos/sharing-outfit-poster.webp',label:'Sharing Outfit demonstration, playing without sound'},
-  proficiency:{title:'1. Personalized proficiency',src:'/videos/personalized-proficiency.mp4',poster:'/videos/personalized-proficiency-poster.webp',label:'Personalized proficiency demonstration, playing without sound'},
-  clothing:{title:'2. Find Clothing',src:'/videos/find-clothing.mp4',poster:'/videos/find-clothing-poster.webp',label:'Find Clothing demonstration, playing without sound'},
-  scan:{title:'3. Scan the Cloth',src:'/videos/scan-the-cloth.mp4',poster:'/videos/scan-the-cloth-poster.webp',label:'Scan the Cloth demonstration, playing without sound',loop:false},
+  sharing:{title:'Share Your Outfit',src:'/videos/sharing-outfit.mp4',poster:'/videos/sharing-outfit-poster.webp',label:'Share Your Outfit demonstration, playing without sound',notes:[{icon:'share',text:'Save and share completed outfits'},{icon:'likes',text:'Earn likes from other participants'},{icon:'ranking',text:'Compete on the community leaderboard'}]},
+  proficiency:{title:'Personalized Learning',src:'/videos/personalized-proficiency.mp4',poster:'/videos/personalized-proficiency-poster.webp',label:'Personalized Learning demonstration, playing without sound',notes:[{icon:'account',text:'Scan your Duolingo account'},{icon:'challenge',text:'Receive challenges based on French proficiency'},{icon:'learn',text:'Learn at your own level'}]},
+  clothing:{title:'Receive a Prompt',src:'/videos/find-clothing.mp4',poster:'/videos/find-clothing-poster.webp',label:'Receive a Prompt demonstration, playing without sound',notes:[{icon:'listen',text:'Read or listen to a French clothing prompt'},{icon:'find',text:'Find the matching item in the installation'},{icon:'interact',text:'Practice vocabulary through physical interaction'}]},
+  scan:{title:'Scan and Receive Feedback',src:'/videos/scan-the-cloth.mp4',poster:'/videos/scan-the-cloth-poster.webp',label:'Scan and Receive Feedback demonstration, playing without sound',loop:false,notes:[{icon:'scan',text:'Scan the selected clothing item'},{icon:'progress',text:'Earn progress and dress your avatar, receive hints or retries'}]},
 }
 
 export default function KioskVideoPanel({demo='proficiency',showGallery=false,galleryReplay=0}) {
@@ -36,7 +37,7 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,ga
     {ready ? <video key={demo==='sharing'?galleryReplay:'clip'} ref={videoRef} src={content.src} poster={content.poster} autoPlay muted playsInline loop={content.loop??true} preload="auto" aria-label={content.label} onLoadedData={playVideo} onPlay={()=>setNeedsPlay(false)} onVolumeChange={event=>{event.currentTarget.muted=true}}/> : <img src={content.poster} alt=""/>}
     {needsPlay&&<button className="video-play-button" onClick={playVideo}>Play video <span aria-hidden="true">▶</span></button>}
   </>
-  return <motion.aside className={`kiosk-video-panel ${demo==='sharing'?'sharing-outfit-panel':''}`} aria-labelledby={titleId} initial={reduced?{opacity:0,y:'-50%'}:{opacity:0,x:45,y:'-50%',scale:.94}} animate={{opacity:1,x:0,y:'-50%',scale:1}} transition={{duration:reduced?.1:.38,type:'spring',bounce:.15}} exit={{opacity:0,x:15}} onAnimationComplete={()=>setReady(true)}>
+  return <motion.aside className={`kiosk-video-panel ${demo==='sharing'?'sharing-outfit-panel':''} ${demo==='scan'&&!showGallery?'has-nfc-sticker':''}`} aria-labelledby={titleId} initial={reduced?{opacity:0,y:'-50%'}:{opacity:0,x:45,y:'-50%',scale:.94}} animate={{opacity:1,x:0,y:'-50%',scale:1}} transition={{duration:reduced?.1:.38,type:'spring',bounce:.15}} exit={{opacity:0,x:15}} onAnimationComplete={()=>setReady(true)}>
     <AnimatePresence>
       {demo==='scan'&&!showGallery&&<motion.div className="nfc-sticker-group" key="nfc-phone" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.18}}>
         <span className="nfc-sticker-label">NFC tag<svg viewBox="0 0 45 25" fill="none" aria-hidden="true"><path d="M3 7C14 2 25 3 37 17M28 16l10 2-2-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
@@ -56,5 +57,6 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,ga
         </motion.div>}
       </AnimatePresence>
     </div>
+    <PanelNotes items={content.notes}/>
   </motion.aside>
 }
