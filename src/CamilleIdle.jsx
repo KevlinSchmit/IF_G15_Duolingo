@@ -1,8 +1,50 @@
 import { useEffect, useId, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
+import RigMotion from './RigMotion'
 
-const expressions=[{name:'neutral',duration:3600},{name:'relaxed',duration:2400},{name:'wink',duration:650},{name:'neutral',duration:3900},{name:'wink',duration:600}]
-const forearm='M128 625Q108 559 153 526Q190 503 223 531Q246 552 273 594L340 710 361 748 323 790Q280 805 244 764L164 650Z'
+// Wave → lower hands → hands on hips → present → shrug → return to the wave.
+const routine=[
+  {time:0, left:[50,100,0],right:[-15,0,0],lean:0,lift:0},
+  {time:.06,left:[42,112,-8],right:[-14,0,0],lean:-2,lift:0},
+  {time:.12,left:[50,82,8],right:[-12,5,0],lean:1.5,lift:-3},
+  {time:.18,left:[43,112,-8],right:[-14,0,0],lean:-1,lift:0},
+  {time:.24,left:[50,90,0],right:[-15,0,0],lean:0,lift:0},
+  {time:.32,left:[18,5,0],right:[-12,5,0],lean:1,lift:0},
+  {time:.40,left:[65,-120,-10],right:[-65,120,10],lean:-2,lift:0},
+  {time:.48,left:[65,-120,-10],right:[-65,120,10],lean:2.5,lift:0},
+  {time:.55,left:[65,-120,-10],right:[-65,120,10],lean:-1.5,lift:0},
+  {time:.63,left:[60,-25,-30],right:[-30,-20,25],lean:0,lift:-3},
+  {time:.70,left:[55,95,-25],right:[-55,-95,25],lean:-2,lift:-12},
+  {time:.77,left:[55,95,-25],right:[-55,-95,25],lean:2,lift:-8},
+  {time:.84,left:[20,0,0],right:[-20,0,0],lean:0,lift:0},
+  {time:.92,left:[50,100,0],right:[-15,0,0],lean:-1,lift:0},
+  {time:1,left:[50,100,0],right:[-15,0,0],lean:0,lift:0},
+]
+const times=routine.map(frame=>frame.time)
+const expressions=[{name:'neutral',duration:1600},{name:'wink',duration:650},{name:'neutral',duration:3800},{name:'relaxed',duration:2700},{name:'neutral',duration:3600},{name:'wink',duration:650},{name:'neutral',duration:1000}]
+
+function Arm({side,id,moving}) {
+  const left=side==='left'
+  const anchor=left?[450,600]:[615,600]
+  const values=index=>routine.map(frame=>frame[side][index])
+  return <g className={`camille-arm camille-arm-${side}`} transform={`translate(${anchor.join(' ')})`}>
+    <RigMotion className="camille-upper-arm" values={values(0)} times={times} enabled={moving}>
+      <path d="M-43 0C-43-26-27-39 0-39S43-26 43 0V180C43 207-43 207-43 180Z" fill={`url(#${id}-sleeve)`}/>
+      <g transform="translate(0 180)">
+        <RigMotion className="camille-lower-arm" values={values(1)} times={times} enabled={moving}>
+          <path d="M-41 0C-41-24-26-39 0-39S41-24 41 0L39 143Q0 156-39 143Z" fill={`url(#${id}-sleeve)`}/>
+          <path d="M-32 132Q0 142 32 132" fill="none" stroke="#ece5db" strokeWidth="3" opacity=".5"/>
+          <g transform="translate(0 141)">
+            <RigMotion className="camille-hand" values={values(2)} times={times} enabled={moving}>
+              <path d="M-30-5Q-36-20-18-25H18Q32-24 32-8L34 14Q49 6 49 22Q48 45 30 58Q14 71-6 64Q-29 55-31 30Z" fill={`url(#${id}-hand)`}/>
+            </RigMotion>
+          </g>
+        </RigMotion>
+      </g>
+    </RigMotion>
+  </g>
+}
+
 export default function CamilleIdle({active=true}) {
   const reduced=useReducedMotion()
   const id=useId().replaceAll(':','')
@@ -19,25 +61,28 @@ export default function CamilleIdle({active=true}) {
   },[active,reduced])
   const moving=active&&!reduced
   const face=moving?expression:'neutral'
-  return <motion.div className="camille-idle" data-pose={face} role="img" aria-label="Camille gently shifts her weight, waves, looks around and winks" animate={moving?{x:[0,1.5,-1.5,0],y:[0,-1.5,0,0],rotate:[0,.65,-.65,0],scaleY:[1,1.003,.998,1]}:{x:0,y:0,rotate:0,scaleY:1}} transition={{duration:moving?6.8:.6,repeat:moving?Infinity:0,ease:[.45,0,.55,1]}}>
+  return <div className="camille-idle" data-pose={face} role="img" aria-label="Camille waves, rests her hands on her hips, presents the installation and shrugs">
     <svg className="camille-puppet" viewBox="0 0 1024 1490" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
       <defs>
-        <clipPath id={`${id}-forearm`}><path d={forearm}/></clipPath>
-        <clipPath id={`${id}-elbow`}><ellipse cx="331" cy="743" rx="31" ry="30"/></clipPath>
+        <linearGradient id={`${id}-sleeve`}><stop stopColor="#fffdf9"/><stop offset=".65" stopColor="#fffaf3"/><stop offset="1" stopColor="#f8f2e9"/></linearGradient>
+        <linearGradient id={`${id}-hand`} x2=".8" y2="1"><stop stopColor="#fbd6aa"/><stop offset="1" stopColor="#f1c18f"/></linearGradient>
         <clipPath id={`${id}-eyes`}><ellipse cx="485" cy="328" rx="68" ry="65"/><ellipse cx="617" cy="344" rx="65" ry="58"/></clipPath>
-        <mask id={`${id}-body`} maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1536"><rect width="1024" height="1536" fill="white"/><path d={forearm} fill="black"/></mask>
       </defs>
-      <image className="camille-arm-backdrop" href="/camille-idle-relaxed.png" width="1024" height="1536" clipPath={`url(#${id}-forearm)`}/>
-      <image className="camille-stable-body" href="/camille-cartoon.png" width="1024" height="1536" mask={`url(#${id}-body)`}/>
-      <g className="camille-forearm">
-        {moving&&<animateTransform attributeName="transform" type="rotate" values="0 316 735;0 316 735;3.5 316 735;-3 316 735;2.5 316 735;0 316 735;0 316 735" keyTimes="0;.3;.44;.58;.72;.84;1" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1" dur="6.4s" repeatCount="indefinite"/>}
-        <image href="/camille-cartoon.png" width="1024" height="1536" clipPath={`url(#${id}-forearm)`}/>
-      </g>
-      <image href="/camille-cartoon.png" width="1024" height="1536" clipPath={`url(#${id}-elbow)`}/>
-      <g clipPath={`url(#${id}-eyes)`}>
-        <motion.image className="camille-expression" data-expression="relaxed" href="/camille-idle-relaxed.png" width="1024" height="1536" initial={false} animate={{opacity:face==='relaxed'?1:0}} transition={{duration:reduced?0:.18,ease:'easeInOut'}}/>
-        <motion.image className="camille-expression" data-expression="wink" href="/camille-idle-wink.png" width="1024" height="1536" initial={false} animate={{opacity:face==='wink'?1:0}} transition={{duration:reduced?0:.12,ease:'easeInOut'}}/>
-      </g>
+      <RigMotion type="translate" className="camille-body-lift" values={routine.map(frame=>[0,frame.lift])} times={times} enabled={moving}>
+        <g transform="translate(550 1455)">
+          <RigMotion className="camille-body-lean" values={routine.map(frame=>frame.lean)} times={times} enabled={moving}>
+            <g transform="translate(-550 -1455)">
+              <image className="camille-stable-body" href="/camille-animation-body.png" width="1024" height="1536"/>
+              <Arm side="left" id={id} moving={moving}/>
+              <Arm side="right" id={id} moving={moving}/>
+              <g clipPath={`url(#${id}-eyes)`}>
+                <image className="camille-expression" data-expression="relaxed" href="/camille-idle-relaxed.png" width="1024" height="1536" style={{opacity:face==='relaxed'?1:0,transition:reduced?'none':'opacity .18s ease-in-out'}}/>
+                <image className="camille-expression" data-expression="wink" href="/camille-idle-wink.png" width="1024" height="1536" style={{opacity:face==='wink'?1:0,transition:reduced?'none':'opacity .12s ease-in-out'}}/>
+              </g>
+            </g>
+          </RigMotion>
+        </g>
+      </RigMotion>
     </svg>
-  </motion.div>
+  </div>
 }
