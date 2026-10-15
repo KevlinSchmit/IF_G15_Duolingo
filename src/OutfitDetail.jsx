@@ -13,7 +13,7 @@ const glints=[
   [140,230,1],[650,150,.8],[605,315,.55],[125,485,.65],[670,600,.9],[170,720,.8],[565,800,.6],[285,115,.4],[655,760,.4],
 ]
 
-export default function OutfitDetail({hideCharacter=false,replay=0}) {
+export default function OutfitDetail({hideCharacter=false,replay=0,showLearner=false}) {
   const reduced=useReducedMotion()
   const [mobile,setMobile]=useState(()=>window.matchMedia('(max-width:750px)').matches)
   useEffect(()=>{
@@ -24,10 +24,10 @@ export default function OutfitDetail({hideCharacter=false,replay=0}) {
   },[])
   const active=!hideCharacter
   const hero=mobile?{x:20,y:250,width:470,height:564}:{x:140,y:130,width:540,height:690}
-  return <motion.section className="outfit-detail" aria-label="The winning Duo outfit and its French vocabulary" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.28}}>
+  return <motion.section className={`outfit-detail ${showLearner?'has-learner':''}`} aria-label="The winning Duo outfit and its French vocabulary" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.28}}>
     <svg className="outfit-diagram" viewBox={mobile?'0 0 900 1100':'0 0 1600 900'} role="img" aria-labelledby="outfit-title outfit-description">
       <title id="outfit-title">Le look gagnant</title>
-      <desc id="outfit-description">Duo’s winning French outfit: a feathered tricorne, an embroidered coat, a lace jabot and breeches. Four French labels and their English translations appear in sequence.</desc>
+      <desc id="outfit-description">Duo’s winning French outfit: a feathered tricorne, an embroidered coat, a lace jabot and breeches. {showLearner?'English translations appear below the French labels, followed by Emma’s learning profile.':'Four French labels appear in sequence.'}</desc>
       <text className="outfit-heading" x={mobile?65:100} y={mobile?90:80}>Le look gagnant.</text>
       <ellipse cx={mobile?250:410} cy={mobile?530:475} rx={mobile?235:325} ry={mobile?355:345} fill="#fff3c6"/>
       <ellipse cx={mobile?255:420} cy={mobile?810:790} rx={mobile?135:215} ry={mobile?15:17} fill="#e5d8b7" opacity=".55"/>
@@ -41,13 +41,13 @@ export default function OutfitDetail({hideCharacter=false,replay=0}) {
         const {point,bend,end}=mobile?item.mobile:item.desktop
         const delay=reduced?0:.2+index*.52
         return <g key={`${item.id}-${replay}`} className="outfit-annotation" data-clothing={item.id} lang="fr">
-          <motion.path className="outfit-leader" d={`M${point.join(' ')}L${bend.join(' ')}H${end[0]}`} fill="none" stroke="#4c7eab" strokeWidth={mobile?2.3:2} strokeLinecap="round" strokeLinejoin="round" initial={reduced?false:{pathLength:0,opacity:0}} animate={active?{pathLength:1,opacity:1}:{pathLength:0,opacity:0}} transition={{duration:reduced?0:.42,delay}}/>
-          <motion.circle cx={point[0]} cy={point[1]} r={mobile?5:5.5} fill="#fffdf5" stroke="#4c7eab" strokeWidth="2" initial={{opacity:0}} animate={{opacity:active?1:0}} transition={{duration:reduced?0:.15,delay}}/>
-          <motion.text className="outfit-word" x={end[0]+(mobile?18:25)} y={end[1]} dominantBaseline="middle" initial={reduced?false:{opacity:0,x:12}} animate={{opacity:active?1:0,x:0}} transition={{duration:reduced?0:.35,delay:delay+(reduced?0:.25)}}>{item.word}</motion.text>
-          <motion.g className="outfit-translation-pop" lang="en" initial={reduced?false:{opacity:0,y:8,scale:.95}} animate={{opacity:active?1:0,y:active?0:8,scale:active?1:.95}} transition={{duration:reduced?0:.38,delay:delay+(reduced?0:.58),type:'spring',bounce:.22}}><text className="outfit-translation" x={end[0]+(mobile?18:25)} y={end[1]+(mobile?57:44)}>{item.english}</text></motion.g>
+          <motion.path className="outfit-leader" d={`M${point.join(' ')}L${bend.join(' ')}H${end[0]}`} fill="none" stroke="#4c7eab" strokeWidth={mobile?2.3:2} strokeLinecap="round" strokeLinejoin="round" initial={reduced||showLearner?false:{pathLength:0,opacity:0}} animate={active?{pathLength:1,opacity:1}:{pathLength:0,opacity:0}} transition={{duration:reduced||showLearner?0:.42,delay:showLearner?0:delay}}/>
+          <motion.circle cx={point[0]} cy={point[1]} r={mobile?5:5.5} fill="#fffdf5" stroke="#4c7eab" strokeWidth="2" initial={showLearner?false:{opacity:0}} animate={{opacity:active?1:0}} transition={{duration:reduced||showLearner?0:.15,delay:showLearner?0:delay}}/>
+          <motion.text className="outfit-word" x={end[0]+(mobile?18:25)} y={end[1]} dominantBaseline="middle" initial={reduced||showLearner?false:{opacity:0,x:12}} animate={{opacity:active?1:0,x:0}} transition={{duration:reduced||showLearner?0:.35,delay:showLearner?0:delay+(reduced?0:.25)}}>{item.word}</motion.text>
+          {showLearner&&<motion.g className="outfit-translation-pop" lang="en" initial={reduced?false:{opacity:0,y:8,scale:.95}} animate={{opacity:active?1:0,y:active?0:8,scale:active?1:.95}} transition={{duration:reduced?0:.38,delay:delay+(reduced?0:.25),type:'spring',bounce:.22}}><text className="outfit-translation" x={end[0]+(mobile?18:25)} y={end[1]+(mobile?57:44)}>{item.english}</text></motion.g>}
         </g>
       })}
     </svg>
-    <LearnerProgress active={active}/>
+    {showLearner&&<LearnerProgress active={active}/>}
   </motion.section>
 }
