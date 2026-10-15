@@ -2,6 +2,8 @@
 
 An animated Duolingo-inspired presentation built with React, Vite, and Motion.
 
+All slide titles, installation labels, step numerals, floating display words and French clothing labels use locally served Feather Bold, matching the Duolingo heading references. Body copy stays in Nunito. The heading font is preloaded and includes French accents; its source and embedded license reference are recorded in [public/fonts/README.md](public/fonts/README.md).
+
 The opening slide displays a placeholder TEXT title and text text subtitles. A layered French Duo illustration waves its wings and blinks in the corner. Click the opening scene or press Enter, Space, or ArrowRight to fade quickly to Camille while Duo turns sideways and exits to the right; use the back button or ArrowLeft to return. Reduced-motion settings disable Duo’s animations.
 
 Camille’s redesigned profile uses a generated smiling head-and-shoulders portrait, oversized rounded typography, and a bright Duolingo green background. Fashion and Paris illustrations, the words ‘outfits’ and ‘paris’, and an age badge enter with a spring animation and float gently. The profile lists her age and fashion interest, dream of visiting Paris, and frustration with traditional vocabulary lessons as three bullet points. Reduced-motion preferences disable floating. Click anywhere to continue, or use the fullscreen button to present.

@@ -1,0 +1,26 @@
+@font-face{
+  font-family:'Feather Bold';
+  src:url('/fonts/feather-bold.ttf') format('truetype');
+  font-style:normal;
+  font-weight:700;
+  font-display:swap;
+}
+
+:root{--font-heading:'Feather Bold',Nunito,sans-serif}
+
+.profile-page :is(h1,h2,h3,h4,h5,h6,.wordmark,.outfits-word,.paris-word,.outfit-word,.kiosk-step-number){
+  font-family:var(--font-heading);
+  font-weight:700;
+  letter-spacing:0;
+}
+
+.profile-page .opening-copy h1,.profile-page .headline-block h1{
+  letter-spacing:-.02em;
+  line-height:1.02;
+}
+
+.profile-page .outfit-intro .outfit-heading{font-weight:700;letter-spacing:0}
+
+@media(min-width:751px) and (max-width:1100px){
+  .profile-page .headline-block h1{font-size:clamp(78px,8.4vw,100px)}
+}
