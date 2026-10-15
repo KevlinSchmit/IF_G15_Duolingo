@@ -10,7 +10,7 @@ function Flame() {
 
 export default function LearnerProgress({active=true}) {
   const reduced=useReducedMotion()
-  return <motion.section className="learner-profile" aria-label="Emma’s learning progress" initial={reduced?false:{opacity:0,y:14,scale:.98}} animate={{opacity:active?1:0,y:active?0:14,scale:active?1:.98}} transition={{duration:reduced?0:.42,delay:reduced?0:.3,type:'spring',bounce:.18}}>
+  return <motion.section className="learner-profile" aria-label="Emma’s learning progress" initial={reduced?false:{opacity:0,y:14,scale:.98}} animate={{opacity:active?1:0,y:active?0:14,scale:active?1:.98}} transition={{duration:reduced?0:.42,delay:reduced?0:.05,type:'spring',bounce:.18}}>
     <div className="learner-identity">
       <svg className="learner-avatar" viewBox="215 300 740 740" role="img" aria-label="Duo avatar"><image href="/duo-winning-outfit.png" x="0" y="0" width="1146" height="1373"/></svg>
       <div><h3>Emma</h3><p>Advanced French learner</p></div>
@@ -18,7 +18,7 @@ export default function LearnerProgress({active=true}) {
     <div className="learner-proficiency">
       <div className="proficiency-caption"><span>French proficiency</span><strong>70%</strong></div>
       <div className="french-progress-track" role="progressbar" aria-label="French proficiency" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70">
-        <motion.div className="french-progress-fill" initial={reduced?false:{width:'0%'}} animate={{width:active?'70%':'0%'}} transition={{duration:reduced?0:1,delay:reduced?0:.55,ease:[.22,.7,.2,1]}}/>
+        <motion.div className="french-progress-fill" initial={reduced?false:{width:'0%'}} animate={{width:active?'70%':'0%'}} transition={{duration:reduced?0:1,delay:reduced?0:.25,ease:[.22,.7,.2,1]}}/>
       </div>
     </div>
     <div className="learner-streak"><Flame/><div><span>Learning streak</span><strong>890 days</strong></div></div>

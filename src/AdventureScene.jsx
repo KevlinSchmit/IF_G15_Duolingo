@@ -54,6 +54,6 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
     </svg>
     <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter&&!focused}/></div>
     </div></motion.div>
-    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key={showLearner?'learner-outfit':'outfit'} hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
+    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }
