@@ -4,6 +4,7 @@ import CamilleIdle from './CamilleIdle'
 import ForegroundDuo from './ForegroundDuo'
 import KioskVideoPanel from './KioskVideoPanel'
 import OutfitDetail from './OutfitDetail'
+import InstallationOverview from './InstallationOverview'
 import './AdventureScene.css'
 
 // Painting order is independent of reveal timing: the ground can arrive last
@@ -35,13 +36,13 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
   const [assembled,setAssembled]=useState(Boolean(reduced))
   useEffect(()=>{
     // Readiness follows navigation only; resizing/fullscreen must not hide the panel.
-    const timer=setTimeout(()=>setCameraReady(focused),focused&&!reduced?750:0)
+    const timer=setTimeout(()=>setCameraReady(focused),focused&&!reduced?900:0)
     return()=>clearTimeout(timer)
   },[focused,reduced])
   const id=useId().replaceAll(':','')
   return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? 'Share Your Outfit video and Paris Fashion Challenge' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
-    {!focused&&!showOutfit&&<h2 className="installation-heading">Inside the Installation</h2>}
-    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
+    {!focused&&!showOutfit&&<InstallationOverview/>}
+    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{delay:focused&&!reduced?.12:0,duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
         {!assembled&&layers.map((layer,index)=><mask key={layer.name} id={`${id}-${layer.name}`} maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900"><path d={layer.path} fill="white"/>{layers.slice(index+1).map(front=><path key={front.name} d={front.path} fill="black"/>)}</mask>)}
@@ -54,7 +55,15 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
       {!focused&&onSelectKiosk&&<g className="kiosk-hit-target" role="button" tabIndex="0" aria-label="Zoom in to machine 01" onClick={onSelectKiosk} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();onSelectKiosk()}}}><rect x="448" y="334" width="163" height="354" rx="24" fill="transparent"/></g>}
     </svg>
     <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter&&!focused}/></div>
-    </div></motion.div>
+    </div>
+    {focused&&demo==='proficiency'&&!showOutfit&&<svg className="kiosk-focus-overlay" viewBox="0 0 1600 900" aria-hidden="true">
+      <motion.g className="kiosk-auto-focus" initial={{opacity:0}} animate={reduced?{opacity:0}:{opacity:[0,1,1,0]}} transition={{duration:1.4,times:[0,.08,.75,1]}}>
+        <rect x="440" y="330" width="176" height="365" rx="30" fill="#ffffff18" stroke="#1cb0f6" strokeWidth="5"/>
+        <motion.circle cx="531" cy="503" r="19" fill="none" stroke="#fff" strokeWidth="4" initial={{scale:.5,opacity:0}} animate={{scale:[.5,1.5,2.3],opacity:[0,.9,0]}} style={{transformOrigin:'531px 503px'}} transition={{delay:.2,duration:.7}}/>
+        <motion.path className="kiosk-auto-pointer" d="m531 503 3 36 10-10 10 17 9-5-10-17 14-3-36-18Z" fill="#285e9b" stroke="white" strokeWidth="3" strokeLinejoin="round" initial={{x:32,y:26}} animate={{x:0,y:0}} transition={{duration:.3,ease:[.22,.7,.2,1]}}/>
+      </motion.g>
+    </svg>}
+    </motion.div>
     <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }

@@ -1,0 +1,26 @@
+.installation-overview{position:absolute;inset:0;z-index:4;pointer-events:none;color:#285e9b}
+.installation-intro{position:absolute;left:4%;top:4%;max-width:70%;isolation:isolate;text-shadow:0 2px 7px #ffffffbd}
+.installation-intro::before{content:"";position:absolute;z-index:-1;inset:-32px -65px -32px -40px;background:radial-gradient(ellipse at 35% 45%,#f4faffeb 5%,#f4faff96 48%,#f4faff00 74%);filter:blur(12px)}
+.installation-heading{margin:0;font-size:clamp(24px,3vw,40px);font-weight:900;line-height:1.12;letter-spacing:-.8px}
+.installation-intro>p{margin:8px 0 0;font-size:clamp(12px,1.25vw,18px);font-weight:800;line-height:1.35}
+.installation-leaders{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1px 2px #ffffffc9)}
+.installation-leaders path{fill:none;stroke:#285e9b;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.installation-leaders circle{fill:#1cb0f6;stroke:#fff;stroke-width:3}
+.installation-callout{position:absolute;padding:10px 16px;background:#fffffff0;border-radius:17px;box-shadow:0 3px 10px #27527b1c}
+.installation-callout h3{margin:0;font-size:clamp(17px,1.8vw,25px);font-weight:900;line-height:1.1;letter-spacing:-.4px}
+.installation-callout p{margin:5px 0 0;font-size:clamp(11px,1.05vw,15px);font-weight:800;line-height:1.25;color:#527493}
+.installation-kiosks{top:25%;left:40%;width:22%;text-align:center}
+.installation-clothing{top:31%;left:4%;width:23%}
+.installation-duomart{top:10%;right:3%;width:23%;text-align:center}
+@media(max-width:750px){
+  .installation-intro{left:4%;top:4%;max-width:77%}
+  .installation-intro::before{inset:-12px -15px;filter:blur(5px)}
+  .installation-heading{font-size:clamp(16px,4.5vw,26px);letter-spacing:-.4px}
+  .installation-intro>p{font-size:clamp(7px,1.95vw,12px);margin-top:3px;max-width:85%}
+  .installation-callout{padding:5px 6px;border-radius:8px}
+  .installation-callout h3{font-size:clamp(8px,2.3vw,17px);letter-spacing:-.2px}
+  .installation-callout p{font-size:clamp(6px,1.7vw,11px);margin-top:3px}
+  .installation-clothing{top:33%;width:27%}
+  .installation-kiosks{top:25%;left:37%;width:30%}
+  .installation-duomart{top:13%;width:27%;right:2%}
+}

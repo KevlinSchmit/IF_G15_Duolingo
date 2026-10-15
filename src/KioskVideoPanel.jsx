@@ -46,13 +46,13 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,ga
         </motion.figure>
       </motion.div>}
     </AnimatePresence>
-    <h2 id={titleId}>{content.title}</h2>
+    <div className="kiosk-panel-heading"><span className="kiosk-step-number" aria-hidden="true">{{proficiency:1,clothing:2,scan:3,sharing:4}[demo]}</span><h2 id={titleId}>{content.title}</h2></div>
     <div className={`proficiency-video-frame ${demo==='sharing'?'sharing-outfit-frame':''}`}>
       <AnimatePresence mode="wait" initial={false}>
         {showGallery ? <ScanResultGallery key={`gallery-${galleryReplay}`}/> : <motion.div key="video" className="scan-video-content" initial={{opacity:0}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:.96}} transition={{duration:reduced?0:.22}}>
           {demo==='sharing' ? <div className="sharing-outfit-media">
             <div className="sharing-video-card">{videoContent}</div>
-            <motion.figure className="sharing-image-card" initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.15,duration:.4,type:'spring',bounce:.2}}><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge leaderboard showing Chloé, Camille, Emma and the community’s outfits"/><span className="winner-outfit-origin" aria-hidden="true"/></motion.figure>
+            <motion.figure className="sharing-image-card" initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.15,duration:.4,type:'spring',bounce:.2}}><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge leaderboard showing Chloé, Emma, Camille and the community’s outfits"/><span className="winner-outfit-origin" aria-hidden="true"/></motion.figure>
           </div> : videoContent}
         </motion.div>}
       </AnimatePresence>

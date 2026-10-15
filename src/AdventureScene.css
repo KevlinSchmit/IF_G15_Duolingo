@@ -4,4 +4,4 @@
 .adventure-artwork{position:absolute;inset:0}.artwork-blurred{filter:blur(2px)}
 .portrait-window{position:relative;aspect-ratio:1;overflow:hidden;border-radius:18px;background:#fff7e8}.portrait-frame .portrait-window img{position:absolute;inset:0;width:100%;height:100%;border-radius:0;object-fit:cover}.portrait-cartoon{opacity:0;transform-origin:50% 75%}.portrait-flash{position:absolute;inset:0;background:radial-gradient(ellipse,white 35%,#ffffffd9 80%);opacity:0;pointer-events:none}.camille-idle .idle-previous-pose{z-index:0}.camille-idle img:last-child{z-index:1}
 
-.installation-heading{position:absolute;z-index:4;left:3%;top:3%;max-width:94%;margin:0;padding:10px 18px;border-radius:16px;background:#ffffffed;color:#285e9b;font-size:clamp(24px,3vw,40px);font-weight:900;line-height:1.12;letter-spacing:-.8px}@media(max-width:750px){.installation-heading{padding:8px 12px;font-size:clamp(16px,4.4vw,24px);border-radius:11px;letter-spacing:-.4px}}
+.kiosk-focus-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.kiosk-auto-pointer{filter:drop-shadow(0 2px 2px #285e9b30)}
