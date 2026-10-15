@@ -1,0 +1,50 @@
+import { useEffect, useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
+import './OutfitDetail.css'
+
+const clothes=[
+  {id:'hat',word:'Le tricorne à plumes',desktop:{point:[440,280],bend:[770,210],end:[895,210]},mobile:{point:[300,350],bend:[465,290],end:[505,290]}},
+  {id:'coat',word:"L'habit brodé",desktop:{point:[520,510],bend:[765,365],end:[895,365]},mobile:{point:[355,565],bend:[465,475],end:[505,475]}},
+  {id:'lace',word:'Le jabot de dentelle',desktop:{point:[435,553],bend:[740,520],end:[895,520]},mobile:{point:[275,595],bend:[455,660],end:[505,660]}},
+  {id:'breeches',word:'La culotte',desktop:{point:[435,660],bend:[760,675],end:[895,675]},mobile:{point:[275,700],bend:[465,845],end:[505,845]}},
+]
+const glints=[
+  [140,230,1],[650,150,.8],[605,315,.55],[125,485,.65],[670,600,.9],[170,720,.8],[565,800,.6],[285,115,.4],[655,760,.4],
+]
+
+export default function OutfitDetail({hideCharacter=false,replay=0}) {
+  const reduced=useReducedMotion()
+  const [mobile,setMobile]=useState(()=>window.matchMedia('(max-width:750px)').matches)
+  useEffect(()=>{
+    const query=window.matchMedia('(max-width:750px)')
+    const change=event=>setMobile(event.matches)
+    query.addEventListener('change',change)
+    return()=>query.removeEventListener('change',change)
+  },[])
+  const active=!hideCharacter
+  const hero=mobile?{x:20,y:250,width:470,height:564}:{x:140,y:130,width:540,height:690}
+  return <motion.section className="outfit-detail" aria-label="The winning Duo outfit and its French vocabulary" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.28}}>
+    <svg className="outfit-diagram" viewBox={mobile?'0 0 900 1100':'0 0 1600 900'} role="img" aria-labelledby="outfit-title outfit-description">
+      <title id="outfit-title">Le look gagnant</title>
+      <desc id="outfit-description">Duo’s winning French outfit: a feathered tricorne, an embroidered coat, a lace jabot and breeches. Four labels appear in sequence.</desc>
+      <text className="outfit-heading" x={mobile?65:100} y={mobile?90:80}>Le look gagnant.</text>
+      <ellipse cx={mobile?250:410} cy={mobile?530:475} rx={mobile?235:325} ry={mobile?355:345} fill="#fff3c6"/>
+      <ellipse cx={mobile?255:420} cy={mobile?810:790} rx={mobile?135:215} ry={mobile?15:17} fill="#e5d8b7" opacity=".55"/>
+      <g className={`outfit-duo-idle ${active&&!reduced?'outfit-duo-breathing':''} ${!active?'outfit-duo-in-flight':''}`} style={{transformOrigin:`${mobile?250:410}px ${mobile?815:820}px`}}>
+        <image className="outfit-duo-target" href="/duo-winning-outfit.png" {...hero} preserveAspectRatio="xMidYMid meet"/>
+      </g>
+      <g className="outfit-sparkles" aria-hidden="true">
+        {glints.map(([x,y,size],index)=><g key={index} transform={`translate(${mobile?x*.6:x} ${mobile?y*1.08+35:y})`}><motion.g className="outfit-glint" initial={{opacity:0}} animate={!active?{opacity:0}:reduced?{opacity:.5,scale:size}:{opacity:[0,.9,0],scale:[size*.65,size*1.15,size*.65]}} transition={reduced?{duration:0}:{duration:2.2+index*.13,delay:index*.23,repeat:Infinity,ease:'easeInOut'}}><path d="M0-12Q2-2 12 0Q2 2 0 12Q-2 2-12 0Q-2-2 0-12Z" fill={index%3===0?'#fff':'#f8bd2b'}/><circle cx="18" cy="-19" r="2.5" fill="#edb526"/></motion.g></g>)}
+      </g>
+      {clothes.map((item,index)=>{
+        const {point,bend,end}=mobile?item.mobile:item.desktop
+        const delay=reduced?0:.2+index*.52
+        return <g key={`${item.id}-${replay}`} className="outfit-annotation" data-clothing={item.id} lang="fr">
+          <motion.path className="outfit-leader" d={`M${point.join(' ')}L${bend.join(' ')}H${end[0]}`} fill="none" stroke="#4c7eab" strokeWidth={mobile?2.3:2} strokeLinecap="round" strokeLinejoin="round" initial={reduced?false:{pathLength:0,opacity:0}} animate={active?{pathLength:1,opacity:1}:{pathLength:0,opacity:0}} transition={{duration:reduced?0:.42,delay}}/>
+          <motion.circle cx={point[0]} cy={point[1]} r={mobile?5:5.5} fill="#fffdf5" stroke="#4c7eab" strokeWidth="2" initial={{opacity:0}} animate={{opacity:active?1:0}} transition={{duration:reduced?0:.15,delay}}/>
+          <motion.text className="outfit-word" x={end[0]+(mobile?18:25)} y={end[1]} dominantBaseline="middle" initial={reduced?false:{opacity:0,x:12}} animate={{opacity:active?1:0,x:0}} transition={{duration:reduced?0:.35,delay:delay+(reduced?0:.25)}}>{item.word}</motion.text>
+        </g>
+      })}
+    </svg>
+  </motion.section>
+}
