@@ -37,7 +37,7 @@ const cameraPositions={
   sharing:{scale:1.85,x:'-112%',y:'-36.55%'},
 }
 
-export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
+export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showLeaderboard=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
   const reduced=useReducedMotion()
   const cameraView=!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
   const [cameraReady,setCameraReady]=useState(false)
@@ -48,7 +48,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
     return()=>clearTimeout(timer)
   },[focused,reduced])
   const id=useId().replaceAll(':','')
-  return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? 'Save Your Outfit video, French exercise and learning path' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
+  return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? showLeaderboard ? 'Community outfit leaderboard' : 'Save Your Outfit video, French exercise and learning path' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
     {!focused&&!showOutfit&&<InstallationOverview/>}
     <motion.div className="adventure-world" data-camera-view={cameraView} initial={false} animate={cameraPositions[cameraView]} transition={{delay:focused&&!reduced?.12:0,duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
@@ -71,6 +71,6 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
       </motion.g>
     </svg>}
     </motion.div>
-    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} galleryReplay={videoReplay}/>}</AnimatePresence>
+    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }

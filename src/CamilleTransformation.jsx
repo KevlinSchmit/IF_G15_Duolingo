@@ -21,20 +21,22 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
     const run=async()=>{
       // All shoulder portraits and the flash live inside the original photo window.
       await Promise.all([
-        move(local('.portrait-flash'),{opacity:[0,1,1,0]},{duration:.2,times:[0,.25,.45,1]}),
-        move(local('.portrait-neutral'),{opacity:1},{delay:.06,duration:.04}),
-        move(local('.portrait-real'),{opacity:0},{delay:.09,duration:.04}),
+        move(local('.portrait-flash'),{opacity:[0,1,1,0]},{duration:.32,times:[0,.25,.45,1]}),
+        move(local('.portrait-neutral'),{opacity:1},{delay:.1,duration:.08}),
+        move(local('.portrait-real'),{opacity:0},{delay:.14,duration:.08}),
         // The first visible cartoon portrait is already blinking in the same frame.
-        move(local('.portrait-wink'),{opacity:1},{delay:.06,duration:.04}),
+        move(local('.portrait-wink'),{opacity:1},{delay:.1,duration:.08}),
       ])
       if(cancelled)return
       phase('expression')
-      await move(local('.portrait-wink'),{opacity:0},{duration:.08})
+      await move(local('.portrait-wink'),{opacity:0},{duration:.16})
+      // Leave a readable shoulder portrait before the full-body reveal.
+      await move(local('.portrait-neutral'),{scale:[1,1.015,1]},{duration:.2,ease:'easeInOut'})
       if(cancelled)return
       phase('jump')
       await Promise.all([
-        move(local('.portrait-neutral'),{opacity:0},{duration:.1}),
-        move('.camille-transform-actor',{opacity:1,y:-45,height:origin.height*1.55,scale:1.02,rotate:2},{duration:.18,ease:[.2,.7,.25,1]}),
+        move(local('.portrait-neutral'),{opacity:0},{duration:.14}),
+        move('.camille-transform-actor',{opacity:1,y:-45,height:origin.height*1.55,scale:1.02,rotate:2},{duration:.25,ease:[.2,.7,.25,1]}),
       ])
       if(cancelled)return
       callbacks.current.onReveal()
@@ -43,7 +45,7 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       if(cancelled)return
       const stage=destination.getBoundingClientRect()
       phase('land')
-      await move('.camille-transform-actor',{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.36,ease:[.32,0,.22,1]})
+      await move('.camille-transform-actor',{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.42,ease:[.32,0,.22,1]})
       await move('.camille-transform-actor',{scaleY:[1,.97,1],y:[stage.top-origin.top,stage.top-origin.top+3,stage.top-origin.top]},{duration:.1})
       if(!cancelled)callbacks.current.onComplete()
     }
