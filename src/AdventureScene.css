@@ -5,3 +5,6 @@
 .portrait-window{position:relative;aspect-ratio:1;overflow:hidden;border-radius:18px;background:#fff7e8}.portrait-frame .portrait-window img{position:absolute;inset:0;width:100%;height:100%;border-radius:0;object-fit:cover}.portrait-cartoon{opacity:0;transform-origin:50% 75%}.portrait-flash{position:absolute;inset:0;background:radial-gradient(ellipse,white 35%,#ffffffd9 80%);opacity:0;pointer-events:none}.camille-idle .idle-previous-pose{z-index:0}.camille-idle img:last-child{z-index:1}
 
 .kiosk-focus-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.kiosk-auto-pointer{filter:drop-shadow(0 2px 2px #285e9b30)}
+
+/* Continue the painting behind the panel when the camera reaches its right edge. */
+.adventure-world::after{content:"";position:absolute;left:calc(100% - 1px);top:0;width:calc(100% + 2px);height:100%;background:url('/paris-adventure.png') center/100% 100% no-repeat;transform:scaleX(-1);filter:blur(2px);pointer-events:none}

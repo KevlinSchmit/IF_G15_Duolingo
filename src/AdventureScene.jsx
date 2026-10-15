@@ -29,9 +29,17 @@ const layers = [
   {name:'share-sign',path:'M1385 620Q1390 605 1412 609L1578 625Q1595 630 1595 656L1595 900H1348L1329 848Z',delay:.58,origin:'1470px 890px'},
 ]
 const lamps=[{x:68,y:216},{x:514,y:154},{x:802,y:207},{x:1116,y:207}]
+const cameraPositions={
+  overview:{scale:1,x:'0%',y:'0%'},
+  kiosks:{scale:1.85,x:'-5%',y:'-4%'},
+  clothing:{scale:1.85,x:'25%',y:'-9%'},
+  // Place the share sign beside the fixed panel, keeping the ground in view.
+  sharing:{scale:1.85,x:'-112%',y:'-36.55%'},
+}
 
 export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
   const reduced=useReducedMotion()
+  const cameraView=!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
   const [cameraReady,setCameraReady]=useState(false)
   const [assembled,setAssembled]=useState(Boolean(reduced))
   useEffect(()=>{
@@ -42,7 +50,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
   const id=useId().replaceAll(':','')
   return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? 'Share Your Outfit video and Paris Fashion Challenge' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
     {!focused&&!showOutfit&&<InstallationOverview/>}
-    <motion.div className="adventure-world" initial={false} animate={focused?{scale:1.85,x:'-5%',y:'-4%'}:{scale:1,x:'0%',y:'0%'}} transition={{delay:focused&&!reduced?.12:0,duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
+    <motion.div className="adventure-world" data-camera-view={cameraView} initial={false} animate={cameraPositions[cameraView]} transition={{delay:focused&&!reduced?.12:0,duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
         {!assembled&&layers.map((layer,index)=><mask key={layer.name} id={`${id}-${layer.name}`} maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900"><path d={layer.path} fill="white"/>{layers.slice(index+1).map(front=><path key={front.name} d={front.path} fill="black"/>)}</mask>)}
