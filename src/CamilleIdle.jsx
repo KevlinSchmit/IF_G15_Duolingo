@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react'
 import { useReducedMotion } from 'motion/react'
 import RigMotion from './RigMotion'
+import CamilleArm from './CamilleArm'
 
 // Wave → lower hands → hands on hips → present → shrug → return to the wave.
 const routine=[
@@ -23,28 +24,6 @@ const routine=[
 const times=routine.map(frame=>frame.time)
 const expressions=[{name:'neutral',duration:1600},{name:'wink',duration:650},{name:'neutral',duration:3800},{name:'relaxed',duration:2700},{name:'neutral',duration:3600},{name:'wink',duration:650},{name:'neutral',duration:1000}]
 
-function Arm({side,id,moving}) {
-  const left=side==='left'
-  const anchor=left?[450,600]:[615,600]
-  const values=index=>routine.map(frame=>frame[side][index])
-  return <g className={`camille-arm camille-arm-${side}`} transform={`translate(${anchor.join(' ')})`}>
-    <RigMotion className="camille-upper-arm" values={values(0)} times={times} enabled={moving}>
-      <path d="M-43 0C-43-26-27-39 0-39S43-26 43 0V180C43 207-43 207-43 180Z" fill={`url(#${id}-sleeve)`}/>
-      <g transform="translate(0 180)">
-        <RigMotion className="camille-lower-arm" values={values(1)} times={times} enabled={moving}>
-          <path d="M-41 0C-41-24-26-39 0-39S41-24 41 0L39 143Q0 156-39 143Z" fill={`url(#${id}-sleeve)`}/>
-          <path d="M-32 132Q0 142 32 132" fill="none" stroke="#ece5db" strokeWidth="3" opacity=".5"/>
-          <g transform="translate(0 141)">
-            <RigMotion className="camille-hand" values={values(2)} times={times} enabled={moving}>
-              <path d="M-30-5Q-36-20-18-25H18Q32-24 32-8L34 14Q49 6 49 22Q48 45 30 58Q14 71-6 64Q-29 55-31 30Z" fill={`url(#${id}-hand)`}/>
-            </RigMotion>
-          </g>
-        </RigMotion>
-      </g>
-    </RigMotion>
-  </g>
-}
-
 export default function CamilleIdle({active=true}) {
   const reduced=useReducedMotion()
   const id=useId().replaceAll(':','')
@@ -64,7 +43,7 @@ export default function CamilleIdle({active=true}) {
   return <div className="camille-idle" data-pose={face} role="img" aria-label="Camille waves, rests her hands on her hips, presents the installation and shrugs">
     <svg className="camille-puppet" viewBox="0 0 1024 1490" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
       <defs>
-        <linearGradient id={`${id}-sleeve`}><stop stopColor="#fffdf9"/><stop offset=".65" stopColor="#fffaf3"/><stop offset="1" stopColor="#f8f2e9"/></linearGradient>
+        <linearGradient id={`${id}-sleeve`} x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fffdfa"/><stop offset=".7" stopColor="#fffaf5"/><stop offset="1" stopColor="#faf5ed"/></linearGradient>
         <linearGradient id={`${id}-hand`} x2=".8" y2="1"><stop stopColor="#fbd6aa"/><stop offset="1" stopColor="#f1c18f"/></linearGradient>
         <clipPath id={`${id}-eyes`}><ellipse cx="485" cy="328" rx="68" ry="65"/><ellipse cx="617" cy="344" rx="65" ry="58"/></clipPath>
       </defs>
@@ -73,8 +52,8 @@ export default function CamilleIdle({active=true}) {
           <RigMotion className="camille-body-lean" values={routine.map(frame=>frame.lean)} times={times} enabled={moving}>
             <g transform="translate(-550 -1455)">
               <image className="camille-stable-body" href="/camille-animation-body.png" width="1024" height="1536"/>
-              <Arm side="left" id={id} moving={moving}/>
-              <Arm side="right" id={id} moving={moving}/>
+              <CamilleArm side="left" id={id} moving={moving} routine={routine}/>
+              <CamilleArm side="right" id={id} moving={moving} routine={routine}/>
               <g clipPath={`url(#${id}-eyes)`}>
                 <image className="camille-expression" data-expression="relaxed" href="/camille-idle-relaxed.png" width="1024" height="1536" style={{opacity:face==='relaxed'?1:0,transition:reduced?'none':'opacity .18s ease-in-out'}}/>
                 <image className="camille-expression" data-expression="wink" href="/camille-idle-wink.png" width="1024" height="1536" style={{opacity:face==='wink'?1:0,transition:reduced?'none':'opacity .12s ease-in-out'}}/>

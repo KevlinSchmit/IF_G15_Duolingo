@@ -5,7 +5,7 @@ import ScanResultGallery from './ScanResultGallery'
 import PanelNotes from './PanelNotes'
 
 const demos = {
-  sharing:{title:'Share Your Outfit',src:'/videos/sharing-outfit.mp4',poster:'/videos/sharing-outfit-poster.webp',label:'Share Your Outfit demonstration, playing without sound',notes:[{icon:'share',text:'Save and share completed outfits'},{icon:'likes',text:'Earn likes from other participants'},{icon:'ranking',text:'Compete on the community leaderboard'}]},
+  sharing:{title:'Save Your Outfit',src:'/videos/sharing-outfit.mp4',poster:'/videos/sharing-outfit-poster.webp',label:'Save Your Outfit demonstration, playing without sound',notes:[{icon:'share',text:'Save and share completed outfits'},{icon:'likes',text:'Earn likes from other participants'},{icon:'ranking',text:'Compete on the community leaderboard'}]},
   proficiency:{title:'Personalized Learning',src:'/videos/personalized-proficiency.mp4',poster:'/videos/personalized-proficiency-poster.webp',label:'Personalized Learning demonstration, playing without sound',notes:[{icon:'account',text:'Scan your Duolingo account'},{icon:'challenge',text:'Receive challenges based on French proficiency'},{icon:'learn',text:'Learn at your own level'}]},
   clothing:{title:'Receive a Prompt',src:'/videos/find-clothing.mp4',poster:'/videos/find-clothing-poster.webp',label:'Receive a Prompt demonstration, playing without sound',notes:[{icon:'listen',text:'Read or listen to a French clothing prompt'},{icon:'find',text:'Find the matching item in the installation'},{icon:'interact',text:'Practice vocabulary through physical interaction'}]},
   scan:{title:'Scan and Receive Feedback',src:'/videos/scan-the-cloth.mp4',poster:'/videos/scan-the-cloth-poster.webp',label:'Scan and Receive Feedback demonstration, playing without sound',loop:false,notes:[{icon:'scan',text:'Scan the selected clothing item'},{icon:'progress',text:'Earn progress and dress your avatar, receive hints or retries'}]},
@@ -52,7 +52,7 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,ga
         {showGallery ? <ScanResultGallery key={`gallery-${galleryReplay}`}/> : <motion.div key="video" className="scan-video-content" initial={{opacity:0}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:.96}} transition={{duration:reduced?0:.22}}>
           {demo==='sharing' ? <div className="sharing-outfit-media">
             <div className="sharing-video-card">{videoContent}</div>
-            <motion.figure className="sharing-image-card" initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.15,duration:.4,type:'spring',bounce:.2}}><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge leaderboard showing Chloé, Emma, Camille and the community’s outfits"/><span className="winner-outfit-origin" aria-hidden="true"/></motion.figure>
+            {[{src:'/save-outfit/translation.png',alt:'Camille in a French translation exercise: C’est bien !'},{src:'/save-outfit/learning-path.png',alt:'Camille on the Duolingo learning path in Section 4, Unit 32: Talk about the future',dark:true}].map((image,index)=><motion.figure key={image.src} className={`sharing-image-card ${image.dark?'sharing-image-dark':''}`} initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.12+index*.1,duration:.4,type:'spring',bounce:.2}}><img src={image.src} alt={image.alt}/></motion.figure>)}
           </div> : videoContent}
         </motion.div>}
       </AnimatePresence>
