@@ -81,7 +81,7 @@ export default function App() {
     setPage('outfit')
   },[page,reduced])
   useEffect(()=>{
-    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:page==='learner'?[...wardrobe.map(outfit=>outfit.src),'/world-finale/world-land.svg']:page==='world'?['/thank-you-duo-body.webp']:[]
+    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:page==='learner'?[...wardrobe.map(outfit=>outfit.src),'/world-finale/world-land.svg']:[]
     sources.forEach(src=>{const image=new Image();image.src=src;image.decode().catch(()=>{})})
   },[page])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
