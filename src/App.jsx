@@ -9,6 +9,8 @@ import CamilleIdle from './CamilleIdle'
 import OutfitZoom from './OutfitZoom'
 import DiscoveryPoster from './DiscoveryPoster'
 import { Flowers, Sunglasses, Scarf, Tower } from './FrenchAccessories'
+import SoundToggle from './SoundToggle'
+import { usePresentationSound } from './audio/useSoundEffects'
 
 function Spark({className}) {return <svg className={className} viewBox="0 0 60 60" aria-hidden="true"><path d="M30 0c3 21 9 27 30 30-21 3-27 9-30 30C27 39 21 33 0 30 21 27 27 21 30 0Z" fill="currentColor"/></svg>}
 
@@ -25,6 +27,7 @@ export default function App() {
   const reduced = useReducedMotion()
   const [videoReplay,setVideoReplay] = useState(0)
   const [page,setPage] = useState('opening')
+  usePresentationSound(page)
   const [posterImpacted,setPosterImpacted] = useState(false)
   const [transitionOrigin,setTransitionOrigin] = useState(null)
   const duoRef = useRef(null)
@@ -116,7 +119,7 @@ export default function App() {
     setFullscreen(Boolean(document.fullscreenElement))
   }
   return <main className={`profile-page ${page==='discovery'?'profile-poster-page':''} ${page==='outfit'||page==='learner'?'outfit-page':''} ${transitionOrigin || transformOrigin || outfitOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${!['opening','camille','discovery'].includes(page) ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
-    <header className="masthead"><span className="wordmark">duolingo</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
+    <header className="masthead"><span className="wordmark">duolingo</span><div className="masthead-actions"><SoundToggle/><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></div></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
       <div className="opening-copy"><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}><span className="opening-title-brand">Duolingo x</span>{' '}French Fashion Challenge</motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>Group 15</h2><p>{members.map((name,index)=><span key={name}><span className="opening-member">{name}</span>{index<members.length-1?', ':''}</span>)}</p></motion.div></div>

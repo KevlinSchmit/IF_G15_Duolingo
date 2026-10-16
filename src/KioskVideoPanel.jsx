@@ -4,6 +4,7 @@ import './KioskVideoPanel.css'
 import ScanResultGallery from './ScanResultGallery'
 import PanelNotes from './PanelNotes'
 import ScanFeedbackDemo from './ScanFeedbackDemo'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 const demos = {
   sharing:{title:'Save Your Outfit',src:'/videos/sharing-outfit.mp4',poster:'/videos/sharing-outfit-poster.webp',label:'Save Your Outfit demonstration, playing without sound',notes:[{icon:'share',text:'Save and share completed outfits'},{icon:'likes',text:'Earn likes from other participants'},{icon:'ranking',text:'Compete on the community leaderboard'}]},
@@ -21,6 +22,8 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
   const [needsPlay,setNeedsPlay]=useState(false)
   const [leaderboardAspect,setLeaderboardAspect]=useState(3/2)
   const landscapeLeaderboard=leaderboardAspect>1
+  const cues=showGallery?[]:showLeaderboard?[{name:'award',delay:.25,volume:.65}]:demo==='scan'?[{name:'whoosh',volume:.5}]:demo==='sharing'?[{name:'share',delay:.22,volume:.8}]:demo==='clothing'?[{name:'prompt',delay:.22,volume:.7}]:[{name:'pop',delay:.08,volume:.8}]
+  useSoundSequence(`${demo}-${showGallery}-${showLeaderboard}`,cues)
   const playVideo=()=>{
     const video=videoRef.current
     if(!video)return

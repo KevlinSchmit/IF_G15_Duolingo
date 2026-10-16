@@ -32,6 +32,10 @@ The fifteenth and sixteenth steps use a white canvas that fills the viewport, wi
 
 From slide 4 onward, compact header and footer rows and narrower blue margins give the installation more screen space. All pages omit the old top tagline. From slide 9 onward, the white media panels, headings, numbered steps, note text and icons are larger; sharing uses a wider three-card layout and the scan demonstration and leaderboard expand to 95% of the scene width. The final two outfit pages retain their full white canvas with slightly larger labels and subtitles. Responsive grid tracks keep the canvas and profile inside narrow viewports, and fullscreen changes preserve the current scene and feedback state.
 
+Sound effects accompany selected actions rather than ordinary slide navigation: Duo’s exit, the poster’s paper impact, Camille’s camera flash, transformation and jump, the installation’s layered assembly, photo and video-panel entrances, the scan and successful clothing feedback, result-card bounces, sharing, and the winning outfit’s highlight and zoom. Slide 15 plays a short sparkle flourish when Duo lands and quiet notes as the vocabulary labels appear; slide 16 adds a progress chime. The idle animations and twinkling artwork do not repeat their audio. All videos remain muted, and there is no background music.
+
+The speaker button beside fullscreen toggles all effects without advancing the slide and remembers the preference locally. Audio starts after a click, tap or keyboard gesture, in line with browser playback rules. Muting fades out current sounds and cancels scheduled notes; navigation removes sounds from the previous scene while character transitions can finish across page changes. Hiding the tab stops audio, and resizing or entering/exiting fullscreen does not replay cues. Original short tones, filtered noise, pitch bends and bell partials are generated locally with Web Audio in `src/audio/`, with a shared volume bus and compressor; no external audio downloads or libraries are needed. Browsers without Web Audio retain the complete silent presentation.
+
 ## Development
 
 Requires Node.js 24 and npm.

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAnimate } from 'motion/react'
 import './OutfitDetail.css'
+import { useSoundScope } from './audio/useSoundEffects'
 
 export default function OutfitZoom({origin,onReveal,onComplete}) {
   const [scope,animate]=useAnimate()
+  const sound=useSoundScope(true)
   const [phase,setPhase]=useState('highlight')
   const reveal=useRef(onReveal)
   const complete=useRef(onComplete)
@@ -16,6 +18,7 @@ export default function OutfitZoom({origin,onReveal,onComplete}) {
       artwork.src='/duo-winning-outfit.png'
       try{await artwork.decode()}catch{if(!cancelled){reveal.current();complete.current()}return}
       if(cancelled)return
+      sound('glint')
       // Emphasize the actual winner while slide 14 is still visible, then
       // reveal the outfit page and fly the artwork out of that same position.
       control=animate('.outfit-winner-highlight',{opacity:[0,1,0],scale:[.96,1.03,1]},{duration:.28,times:[0,.5,1],ease:'easeInOut'})
@@ -29,12 +32,13 @@ export default function OutfitZoom({origin,onReveal,onComplete}) {
       while(!target&&!cancelled){await new Promise(requestAnimationFrame);target=document.querySelector('.outfit-duo-target')}
       if(cancelled)return
       const end=target.getBoundingClientRect()
+      sound('whoosh',{volume:.65})
       control=animate('.outfit-zoom-actor',{left:end.left,top:end.top,width:end.width,height:end.height,opacity:1},{duration:.68,ease:[.22,.7,.2,1]})
       await control
       if(!cancelled)complete.current()
     }
     run()
     return()=>{cancelled=true;control?.stop()}
-  },[animate,scope,origin])
+  },[animate,scope,origin,sound])
   return <div ref={scope} className="outfit-zoom" data-phase={phase} aria-hidden="true"><div className="outfit-winner-highlight" style={{left:origin.left,top:origin.top,width:origin.width,height:origin.height,opacity:0}}><span>✦</span><span>✦</span><span>✧</span></div><img className="outfit-zoom-actor" src="/duo-winning-outfit.png" alt="" style={{left:origin.left,top:origin.top,width:origin.width,height:origin.height,opacity:0}}/></div>
 }

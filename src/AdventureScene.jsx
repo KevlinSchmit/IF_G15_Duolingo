@@ -8,6 +8,7 @@ import InstallationOverview from './InstallationOverview'
 import InstallationTour from './InstallationTour'
 import SceneAtmosphere from './SceneAtmosphere'
 import './AdventureScene.css'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 // Painting order is independent of reveal timing: the ground can arrive last
 // while still sitting behind the kiosks, characters and displays.
@@ -47,6 +48,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,tourSt
   const cameraView=tourCloseup?`tour-${tourStep}`:!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
   const [cameraReady,setCameraReady]=useState(false)
   const [assembled,setAssembled]=useState(Boolean(reduced))
+  useSoundSequence('installation-assembly',[{name:'assemble',volume:.7}],!assembled)
   useEffect(()=>{
     // Readiness follows navigation only; resizing/fullscreen must not hide the panel.
     const timer=setTimeout(()=>setCameraReady(focused),focused&&!reduced?900:0)

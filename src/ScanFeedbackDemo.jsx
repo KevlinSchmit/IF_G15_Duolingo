@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import './ScanFeedbackDemo.css'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 const shirtOutline='M558 297 Q606 320 655 286 L713 298 Q742 305 770 339 L851 446 Q863 467 841 484 L791 516 L774 487 L778 720 H390 L408 550 L366 529 Q352 519 365 494 L423 379 Q442 349 477 330 Z'
 // Shared coordinates keep the flying garment aligned with the avatar's shirt.
@@ -47,6 +48,8 @@ function ScanFeedbackScreen({phase,reduced}) {
 export default function ScanFeedbackDemo({active=true}) {
   const reduced=useReducedMotion()
   const [phase,setPhase]=useState('playing')
+  const cue={outline:'scan',cartoon:'morph',split:'pop',flying:'whoosh',success:'success'}[phase]
+  useSoundSequence(phase,cue?[{name:cue,volume:phase==='success'?.9:.65}]:[])
   const [needsPlay,setNeedsPlay]=useState(false)
   const [flight,setFlight]=useState(null)
   const rootRef=useRef(null)

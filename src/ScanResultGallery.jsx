@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import './ScanResultGallery.css'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 const cards=[
   {src:'/scan-results/01-success.png',alt:'Successful scan: Camille found the white T-shirt'},
@@ -10,6 +11,7 @@ const cards=[
 export default function ScanResultGallery() {
   const reduced=useReducedMotion()
   const [stage,setStage]=useState(reduced?4:0)
+  useSoundSequence('result-cards',reduced?[{name:'pop',volume:.6}]:[0,.55,1.1].map((delay,index)=>({name:'pop',delay,volume:.6,pitch:1+index*.13})))
   useEffect(()=>{
     if(reduced)return
     const timers=[0,550,1100,1700].map((delay,index)=>setTimeout(()=>setStage(index+1),delay))

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react'
 import './InstallationTour.css'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 const details={
   kiosks:{title:'Check-in & Check-out Kiosks',description:'Activate and complete your visit',photo:'/installation-kiosk-photo.png',photoAlt:'Two physical Duolingo kiosks, numbered 01 and 02, showing Duo and Check in and Check out buttons inside the French fashion installation'},
@@ -10,6 +11,7 @@ const details={
 export default function InstallationTour({step}) {
   const reduced=useReducedMotion()
   const content=details[step]
+  useSoundSequence(step,[{name:'whoosh',volume:.35},{name:'pop',delay:reduced?0:.65,volume:.65}],!!content)
   if(!content)return null
   return <motion.div className={`installation-tour installation-tour-${step}`} aria-label={`${content.title} close-up`} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.2}}>
     <motion.div className="installation-tour-caption" initial={reduced?false:{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{delay:reduced?0:.35,duration:reduced?0:.35}}>

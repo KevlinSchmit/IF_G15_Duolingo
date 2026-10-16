@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import './OutfitDetail.css'
 import LearnerProgress from './LearnerProgress'
+import { useSoundSequence } from './audio/useSoundEffects'
 
 const clothes=[
   {id:'hat',word:'Le tricorne à plumes',english:'Feathered tricorne hat',desktop:{point:[440,280],bend:[770,210],end:[895,210]},mobile:{point:[300,350],bend:[465,290],end:[505,290]}},
@@ -34,6 +35,8 @@ export default function OutfitDetail({hideCharacter=false,replay=0,showLearner=f
     return()=>observer.disconnect()
   },[showLearner])
   const active=!hideCharacter
+  const labelCues=reduced?[]:clothes.map((item,index)=>({name:'label',delay:.45+index*.52+(showLearner?.15:0),volume:.35,pitch:1+index*.08}))
+  useSoundSequence(`${showLearner}-${replay}`,[{name:showLearner?'progress':'sparkle',delay:.05,volume:.85},...labelCues],active)
   const hero=mobile?{x:20,y:250,width:470,height:564}:{x:140,y:130,width:540,height:690}
   return <motion.section ref={rootRef} className={`outfit-detail ${showLearner?'has-learner':''}`} aria-label="The winning Duo outfit and its French vocabulary" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.28}}>
     <header className="outfit-intro"><h2 className="outfit-heading">Advanced Vocabulary Challenges</h2><p className="outfit-subtitle">{showLearner?'Higher proficiency unlocks advanced outfits, while streaks and rankings motivate users to keep learning.':'Higher-level players can access more complex French clothing vocabulary.'}</p></header>
