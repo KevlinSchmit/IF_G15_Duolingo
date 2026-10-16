@@ -6,6 +6,7 @@ import SceneTransition from './SceneTransition'
 import AdventureScene from './AdventureScene'
 import CamilleTransformation from './CamilleTransformation'
 import OutfitZoom from './OutfitZoom'
+import DiscoveryPoster from './DiscoveryPoster'
 
 function Flowers() {
   return <svg viewBox="0 0 170 190" fill="none" aria-hidden="true">
@@ -49,7 +50,7 @@ function Floating({className, children, delay = 0, rotation = 0, reduced}) {
     <motion.div className="float-inner" animate={reduced ? {} : {y:[0,-10,0],rotate:[0,2,0]}} transition={{duration:4.5+delay,repeat:Infinity,delay,ease:'easeInOut'}}>{children}</motion.div>
   </motion.div>
 }
-const slides=['opening','camille','adventure','proficiency','clothing','scan','scan-results','sharing','leaderboard','outfit','learner']
+const slides=['opening','camille','discovery','adventure','proficiency','clothing','scan','scan-results','sharing','leaderboard','outfit','learner']
 
 export default function App() {
   const reduced = useReducedMotion()
@@ -69,8 +70,13 @@ export default function App() {
     setTransitionOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
     setPage('camille')
   }, [page,reduced])
+  const startDiscovery=useCallback(()=>{
+    if(transitionLock.current||page!=='camille')return
+    setPage('discovery')
+    if(window.matchMedia('(max-width:750px)').matches)window.scrollTo({top:0,behavior:reduced?'instant':'smooth'})
+  },[page,reduced])
   const startTransformation = useCallback(() => {
-    if (transitionLock.current || page !== 'camille') return
+    if (transitionLock.current || page !== 'discovery') return
     if (reduced) {setPage('adventure');return}
     transitionLock.current=true
     const rect=portraitRef.current.querySelector('.portrait-window').getBoundingClientRect()
@@ -94,16 +100,16 @@ export default function App() {
     setPage('outfit')
   },[page,reduced])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
-  const goBack = useCallback(() => {if (!transitionLock.current) {setPage(current=>current==='learner' ? 'outfit' : current==='outfit' ? 'leaderboard' : current==='leaderboard' ? 'sharing' : current==='sharing' ? 'scan-results' : current==='scan-results' ? 'scan' : current==='scan' ? 'clothing' : current==='clothing' ? 'proficiency' : current==='proficiency' ? 'adventure' : current==='adventure' ? 'camille' : 'opening')}}, [])
+  const goBack = useCallback(() => {if(!transitionLock.current)setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])}, [])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'learner') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startTransformation();else if(page==='adventure')startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else startLearner()}
+      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'learner') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startDiscovery();else if(page==='discovery')startTransformation();else if(page==='adventure')startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else startLearner()}
       if (event.key === 'ArrowLeft') goBack()
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
-  }, [page,startJourney,startTransformation,startKiosk,startClothing,startScan,startScanResults,startSharing,startLeaderboard,startOutfit,startLearner,goBack])
+  }, [page,startJourney,startDiscovery,startTransformation,startKiosk,startClothing,startScan,startScanResults,startSharing,startLeaderboard,startOutfit,startLearner,goBack])
   const [fullscreen,setFullscreen] = useState(false)
   useEffect(() => {
     const sync = () => setFullscreen(Boolean(document.fullscreenElement))
@@ -113,7 +119,8 @@ export default function App() {
   const advance = () => {
     if (transitionLock.current) return
     if (page==='opening') startJourney()
-    else if (page==='camille') startTransformation()
+    else if (page==='camille') startDiscovery()
+    else if (page==='discovery') startTransformation()
     else if (page==='adventure') startKiosk()
     else if (page==='proficiency') startClothing()
     else if (page==='clothing') startScan()
@@ -129,19 +136,22 @@ export default function App() {
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className={`profile-page ${page==='outfit'||page==='learner'?'outfit-page':''} ${transitionOrigin || transformOrigin || outfitOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan'||page === 'scan-results'||page === 'sharing'||page === 'leaderboard'||page === 'outfit'||page === 'learner' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
+  return <main className={`profile-page ${page==='discovery'?'profile-poster-page':''} ${page==='outfit'||page==='learner'?'outfit-page':''} ${transitionOrigin || transformOrigin || outfitOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${page === 'adventure'||page === 'proficiency'||page === 'clothing'||page === 'scan'||page === 'scan-results'||page === 'sharing'||page === 'leaderboard'||page === 'outfit'||page === 'learner' ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
     <header className="masthead"><span className="wordmark">duolingo</span><span className="chapter-label">A LITTLE FRENCH. A BIG DREAM.</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
       <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}>BONJOUR !</motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}>TEXT<span>.</span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>text text</h2><p>text text</p></motion.div></div>
       <div className="opening-decoration" aria-hidden="true"><Spark/></div>
       <div ref={duoRef} className={`opening-duo ${transitionOrigin ? 'duo-in-transition' : ''}`}><span className="duo-greeting">salut !</span><FrenchDuo/></div>
-    </motion.section> : page === 'camille' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : transformOrigin ? .16 : .35}}><section className="profile-scene" aria-label="Meet Camille">
+    </motion.section> : page === 'camille'||page==='discovery' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : transformOrigin ? .16 : .35}}><section className="profile-scene" aria-label={page==='discovery'?'Camille discovers the French-fashion installation':'Meet Camille'}>
       <div className="headline-block">
+        <motion.div className="headline-content" aria-hidden={page==='discovery'} animate={{opacity:page==='discovery'?0:1}} transition={{duration:reduced?0:.2}}>
         <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
         <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
         <motion.ul className="profile-description profile-facts" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .6}}><li>19-year-old fashion enthusiast</li><li>Dreams of visiting Paris</li><li>Finds traditional vocabulary lessons boring</li></motion.ul>
         <motion.div className="profile-caption" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .9}}><span className="french-flag"><i/><i/><i/></span><span>Next stop? France.</span></motion.div>
+        </motion.div>
+        <AnimatePresence>{page==='discovery'&&<DiscoveryPoster key="discovery-poster" reduced={reduced}/>}</AnimatePresence>
       </div>
       <div className="portrait-world">
         <div className="portrait-backdrop"/>
@@ -165,6 +175,6 @@ export default function App() {
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation portraitRef={portraitRef} origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
     {outfitOrigin&&<OutfitZoom origin={outfitOrigin} onComplete={()=>{setOutfitOrigin(null);transitionLock.current=false}}/>}
-    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin || !!outfitOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Receive a Prompt' : page==='clothing' ? 'Scan and Receive Feedback' : page==='scan' ? 'See scan results' : page==='scan-results' ? 'Save Your Outfit' : page==='sharing' ? 'See the community leaderboard' : page==='leaderboard' ? 'Explore the winning outfit' : page==='outfit' ? 'See Emma’s progress' : 'Replay the labels'} <span aria-hidden="true">{page === 'learner' ? '↻' : '→'}</span></button><span className="page-number">{String(slides.indexOf(page)+1).padStart(2,'0')} <span>/ {slides.length}</span></span></footer>
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin || !!outfitOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Discover the installation' : page==='discovery' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore machine 01' : page==='proficiency' ? 'Receive a Prompt' : page==='clothing' ? 'Scan and Receive Feedback' : page==='scan' ? 'See scan results' : page==='scan-results' ? 'Save Your Outfit' : page==='sharing' ? 'See the community leaderboard' : page==='leaderboard' ? 'Explore the winning outfit' : page==='outfit' ? 'See Emma’s progress' : 'Replay the labels'} <span aria-hidden="true">{page === 'learner' ? '↻' : '→'}</span></button><span className="page-number">{String(slides.indexOf(page)+1).padStart(2,'0')} <span>/ {slides.length}</span></span></footer>
   </main>
 }

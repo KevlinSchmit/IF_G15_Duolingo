@@ -1,0 +1,9 @@
+.headline-content{position:relative}
+.discovery-poster-layer{position:absolute;inset:0;z-index:4;display:grid;place-items:center}
+.discovery-poster{width:min(calc(100% - 32px),390px,calc((100svh - 220px)*941/1672));margin:0;overflow:hidden;border:6px solid #fff;border-radius:20px;background:#fff;box-shadow:0 13px 0 #3f9f0059,0 18px 35px #23570030;transform-origin:50% 55%}
+.discovery-poster img{display:block;width:100%;height:auto}
+@media(max-width:750px){
+  .profile-poster-page .headline-content{position:absolute;inset:0;pointer-events:none}
+  .profile-poster-page .discovery-poster-layer{position:relative;inset:auto;padding:14px 0 20px}
+  .discovery-poster{width:min(86%,290px);border-width:5px;border-radius:17px}
+}
