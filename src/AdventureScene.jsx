@@ -5,6 +5,7 @@ import ForegroundDuo from './ForegroundDuo'
 import KioskVideoPanel from './KioskVideoPanel'
 import OutfitDetail from './OutfitDetail'
 import InstallationOverview from './InstallationOverview'
+import InstallationTour from './InstallationTour'
 import SceneAtmosphere from './SceneAtmosphere'
 import './AdventureScene.css'
 
@@ -33,13 +34,17 @@ const cameraPositions={
   overview:{scale:1,x:'0%',y:'0%'},
   kiosks:{scale:1.85,x:'-5%',y:'-4%'},
   clothing:{scale:1.85,x:'25%',y:'-9%'},
+  'tour-kiosks':{scale:1.6,x:'-19%',y:'-2%'},
+  'tour-clothing':{scale:2.25,x:'41.25%',y:'5%'},
+  'tour-duomart':{scale:1.55,x:'-36.85%',y:'8%'},
   // Place the share sign beside the fixed panel, keeping the ground in view.
   sharing:{scale:1.85,x:'-112%',y:'-36.55%'},
 }
 
-export default function AdventureScene({hideCharacter=false,focused=false,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showLeaderboard=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
+export default function AdventureScene({hideCharacter=false,focused=false,tourStep=null,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showLeaderboard=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
   const reduced=useReducedMotion()
-  const cameraView=!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
+  const tourCloseup=!!tourStep&&tourStep!=='overview'
+  const cameraView=tourCloseup?`tour-${tourStep}`:!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
   const [cameraReady,setCameraReady]=useState(false)
   const [assembled,setAssembled]=useState(Boolean(reduced))
   useEffect(()=>{
@@ -49,7 +54,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
   },[focused,reduced])
   const id=useId().replaceAll(':','')
   return <section className="adventure-scene" aria-label={showOutfit ? 'The winning Duo outfit' : showGallery ? 'Scan and Receive Feedback result screens' : focused ? demo==='sharing' ? showLeaderboard ? 'Community outfit leaderboard' : 'Save Your Outfit video, French exercise and learning path' : demo==='scan' ? 'Scan and Receive Feedback video slide' : demo==='clothing' ? 'Receive a Prompt video slide' : 'Machine 01: Personalized Learning' : 'Camille’s Paris fashion adventure'}><div className={`adventure-stage ${focused?'focused-stage':''} ${showLearner?'outfit-stage':''}`}>
-    {!focused&&!showOutfit&&<InstallationOverview/>}
+    {!showOutfit&&<motion.div className="installation-overview-layer" aria-hidden={focused||tourCloseup} initial={false} animate={{opacity:focused||tourCloseup?0:1}} transition={{duration:reduced?0:.3}}><InstallationOverview/></motion.div>}
     <motion.div className="adventure-world" data-camera-view={cameraView} initial={false} animate={cameraPositions[cameraView]} transition={{delay:focused&&!reduced?.12:0,duration:reduced?0:.75,ease:[.22,.7,.2,1]}}><div className={`adventure-artwork ${focused?'artwork-blurred':''}`}>
     <svg className="adventure-panorama" viewBox="0 0 1600 900" role="group" aria-label="Paris scene with clouds, bridge, lamps, fashion shelves, cashier, three kiosks, Duo displays and a share-your-outfit sign">
       <defs>
@@ -59,9 +64,9 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
       <motion.g className="panorama-composite" initial={reduced?false:{opacity:0}} animate={{opacity:1}} transition={{delay:reduced?0:1.02,duration:reduced?0:.1}} onAnimationComplete={()=>setAssembled(true)}><image href="/paris-adventure-sky.png" width="1600" height="900" preserveAspectRatio="none"/></motion.g>
       <SceneAtmosphere reduced={reduced} active={!showOutfit}/>
       <ForegroundDuo reduced={reduced} active={!focused}/>
-      {!focused&&onSelectKiosk&&<g className="kiosk-hit-target" role="button" tabIndex="0" aria-label="Zoom in to machine 01" onClick={onSelectKiosk} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();onSelectKiosk()}}}><rect x="448" y="334" width="163" height="354" rx="24" fill="transparent"/></g>}
+      {!focused&&!tourCloseup&&onSelectKiosk&&<g className="kiosk-hit-target" role="button" tabIndex="0" aria-label="Zoom in to machine 01" onClick={onSelectKiosk} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();onSelectKiosk()}}}><rect x="448" y="334" width="163" height="354" rx="24" fill="transparent"/></g>}
     </svg>
-    <div className={`adventure-character ${hideCharacter?'character-in-flight':''}`}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter&&!focused}/></div>
+    <motion.div className={`adventure-character ${hideCharacter?'character-in-flight':''}`} animate={{opacity:tourCloseup?0:1}} transition={{duration:reduced?0:.2}}><div className="character-ground-shadow"/><CamilleIdle active={!hideCharacter&&!focused&&!tourCloseup}/></motion.div>
     </div>
     {focused&&demo==='proficiency'&&!showOutfit&&<svg className="kiosk-focus-overlay" viewBox="0 0 1600 900" aria-hidden="true">
       <motion.g className="kiosk-auto-focus" initial={{opacity:0}} animate={reduced?{opacity:0}:{opacity:[0,1,1,0]}} transition={{duration:1.4,times:[0,.08,.75,1]}}>
@@ -71,6 +76,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
       </motion.g>
     </svg>}
     </motion.div>
+    <AnimatePresence>{tourCloseup&&<InstallationTour key={tourStep} step={tourStep}/>}</AnimatePresence>
     <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key="demo-panel" demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }
