@@ -1,0 +1,47 @@
+.scan-feedback-demo{position:absolute;inset:0;overflow:hidden;background:#f3f9ff;container-type:size}
+.scan-feedback-recording{position:absolute;left:0;top:0;width:100%;height:100%;display:grid;place-items:center;transition:width .75s cubic-bezier(.22,.7,.2,1),padding .75s cubic-bezier(.22,.7,.2,1)}
+.scan-feedback-recording-inner{position:relative;width:min(100%,calc(100cqh * 16/9));aspect-ratio:16/9;overflow:hidden;background:#f3f9ff}
+.scan-feedback-recording-inner video,.scan-feedback-recording-inner .scan-feedback-last-frame{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain}
+.scan-feedback-last-frame{z-index:1}
+.scan-shirt-outline{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible}
+.scan-shirt-outline path{fill:none;stroke:#1cb0f6;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px #fff)}
+.scan-feedback-split .scan-feedback-recording{width:61%;padding:16px 0 16px 14px}
+.scan-feedback-split .scan-feedback-recording-inner{border-radius:13px;box-shadow:0 3px 0 #d5e8fa}
+.scan-shirt-source{position:absolute;left:28%;top:38%;width:40%;height:62%;z-index:3;display:grid;place-items:center;pointer-events:none}
+.scan-cartoon-shirt{width:100%;height:100%;filter:drop-shadow(0 3px 3px #123c7420)}
+.scan-cartoon-shirt svg,.scan-flying-shirt svg{display:block;width:100%;height:100%}
+.scan-feedback-game{position:absolute;left:64%;top:3%;width:33%;height:94%;transform-origin:50% 70%;pointer-events:none}
+.scan-feedback-screen{position:relative;display:flex;flex-direction:column;height:100%;overflow:hidden;padding:3.5%;border:3px solid #71bcfa;border-radius:18px;background:#fff;box-shadow:0 5px 0 #c9e6fa}
+.scan-game-status{display:flex;align-items:center;gap:5%;flex:none;height:10%;min-height:20px}
+.scan-game-home{flex:none;display:grid;place-items:center;width:12%;aspect-ratio:1;border-radius:50%;background:#e1f2ff;color:#40a1f6}
+.scan-game-home svg{width:70%}
+.scan-game-progress{flex:1;height:7px;overflow:hidden;background:#e4e9ed;border-radius:20px}
+.scan-game-progress>span{display:block;height:100%;background:#58cc02;border-radius:20px}
+.scan-game-count{display:flex;align-items:center;gap:4px;color:#f34670;font-size:clamp(10px,2cqw,24px);font-weight:900}
+.scan-game-count svg{width:clamp(15px,3cqw,32px)}
+.scan-game-prompt{display:flex;align-items:center;gap:6%;flex:none;margin:5% 1% 1%;padding:5%;border:2px solid #dce4e9;border-radius:12px;color:#38434c;font-size:clamp(8px,1.65cqw,19px);font-weight:900;line-height:1.25;background:#fff}
+.scan-game-prompt svg{width:13%;flex:none;color:#1cb0f6}
+.scan-avatar-scene{position:relative;flex:1;min-height:0}
+.scan-feedback-avatar{position:absolute;inset:0 8%;transform-origin:50% 100%}
+.scan-feedback-avatar>svg{display:block;width:100%;height:100%;overflow:visible}
+.scan-avatar-shirt-target{pointer-events:none}
+.scan-avatar-ground{position:absolute;left:17%;bottom:1%;width:66%;height:4%;border-radius:50%;background:#e4ebf0}
+.scan-paris-landmark{position:absolute;right:-13%;bottom:-2%;width:61%;opacity:.65}
+.scan-feedback-avatar.is-equipped{animation:scan-avatar-happy-idle 4.5s ease-in-out 1.2s infinite}
+.scan-success-glints{position:absolute;inset:0;pointer-events:none;color:#ffc800}
+.scan-success-glints span{position:absolute;font-size:clamp(16px,3.5cqw,40px)}
+.scan-success-glints span:nth-child(1){left:4%;top:35%}.scan-success-glints span:nth-child(2){right:2%;top:14%;font-size:clamp(20px,4cqw,46px)}.scan-success-glints span:nth-child(3){right:1%;bottom:20%}
+.scan-feedback-footer{flex:none;height:13%;margin:3% -4% -4%}
+.scan-found-banner{display:flex;align-items:center;justify-content:center;gap:8px;height:100%;padding:5% 3%;border-radius:14px 14px 0 0;background:#d8f7b9;color:#4a8127;font-size:clamp(11px,2.2cqw,26px);font-weight:900}
+.scan-found-check{display:grid;place-items:center;width:1.5em;aspect-ratio:1;border-radius:50%;background:#78bb37;color:#fff;font-size:1em;line-height:1}
+.scan-flying-shirt{position:absolute;z-index:5;pointer-events:none;filter:drop-shadow(0 5px 8px #285e9b30)}
+.scan-feedback-panel{width:90%;right:5%}
+.kiosk-video-panel{transition:width .6s cubic-bezier(.22,.7,.2,1),right .6s cubic-bezier(.22,.7,.2,1)}
+.scan-feedback-panel .nfc-phone-sticker{top:-6px;right:-18px;width:clamp(42px,5.5vw,76px)}
+.scan-feedback-panel .nfc-sticker-label{top:8px;right:72px;font-size:14px}
+.scan-feedback-panel .nfc-sticker-group{transition:filter .25s}
+.scan-feedback-panel:has(.scan-feedback-demo:not([data-phase="playing"])) .nfc-sticker-group{filter:opacity(0)}
+@keyframes scan-avatar-happy-idle{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-4px) rotate(-1.5deg)}70%{transform:translateY(-1px) rotate(1deg)}}
+@media(max-height:700px) and (min-width:751px){.scan-feedback-panel{padding:14px}.scan-feedback-panel .kiosk-panel-heading{margin-bottom:10px}.scan-feedback-panel .kiosk-step-number{font-size:40px}.scan-feedback-panel .panel-notes{margin-top:10px;gap:5px}.scan-feedback-panel .panel-note-icon{width:23px;height:23px}.scan-feedback-panel .panel-notes li{font-size:12px}.scan-game-prompt{padding:3%;font-size:clamp(8px,1.4cqw,16px)}.scan-found-banner{font-size:clamp(10px,1.8cqw,22px)}}
+@media(max-width:750px){.scan-feedback-panel{width:96%;right:2%}.scan-feedback-panel .proficiency-video-frame{aspect-ratio:4/3}.scan-feedback-panel .nfc-phone-sticker{width:38px;right:12px;top:-6px}.scan-feedback-panel .nfc-sticker-label{right:62px;top:1px;font-size:11px}.scan-feedback-split .scan-feedback-recording{width:59%;padding:8px 0 8px 6px}.scan-feedback-game{left:61%;width:37%;top:6%;height:88%}.scan-feedback-screen{border-width:2px;border-radius:11px}.scan-game-progress{height:5px}.scan-game-prompt{border-width:1px;border-radius:7px}.scan-feedback-split .scan-feedback-recording-inner{border-radius:8px}.scan-game-count{gap:2px}.scan-found-banner{gap:4px;border-radius:8px 8px 0 0}.scan-shirt-outline path{stroke-width:7px}}
+@media(prefers-reduced-motion:reduce){.scan-feedback-recording,.kiosk-video-panel{transition:none}.scan-feedback-avatar.is-equipped{animation:none}}

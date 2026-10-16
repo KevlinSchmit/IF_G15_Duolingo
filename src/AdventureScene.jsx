@@ -71,6 +71,6 @@ export default function AdventureScene({hideCharacter=false,focused=false,onSele
       </motion.g>
     </svg>}
     </motion.div>
-    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key={demo} demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
+    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key="demo-panel" demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
   </div></section>
 }
