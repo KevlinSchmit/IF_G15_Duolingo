@@ -81,7 +81,7 @@ export default function App() {
     setPage('outfit')
   },[page,reduced])
   useEffect(()=>{
-    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:page==='learner'?[...wardrobe.map(outfit=>outfit.src),'/world-finale/world-land.svg']:page==='world'?['/thank-you-duo.webp']:[]
+    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:page==='learner'?[...wardrobe.map(outfit=>outfit.src),'/world-finale/world-land.svg']:page==='world'?['/thank-you-duo-body.webp']:[]
     sources.forEach(src=>{const image=new Image();image.src=src;image.decode().catch(()=>{})})
   },[page])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
@@ -93,10 +93,13 @@ export default function App() {
   },[page])
   const startThanks=useCallback(()=>{
     if(transitionLock.current||page!=='world')return
-    setWorldOrigin(null)
     setPage('thank-you')
   },[page])
-  const goBack = useCallback(() => {if(!transitionLock.current)setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])}, [])
+  const goBack = useCallback(() => {
+    if(transitionLock.current)return
+    if(page==='thank-you')setWorldOrigin(null)
+    setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])
+  }, [page])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
@@ -168,7 +171,7 @@ export default function App() {
         <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
         <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
-    </section></motion.div> : page==='thank-you' ? <ThankYouSlide key="thank-you"/> : <motion.div key="adventure" className="presentation-scene" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene tourStep={tourPages.includes(page)?page.slice(5):null} hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'||page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'} showGallery={page==='scan-results'} showLeaderboard={page==='leaderboard'} showOutfit={page==='outfit'||page==='learner'||page==='world'} showLearner={page==='learner'||page==='world'} showFinale={page==='world'} finaleOrigin={worldOrigin} hideOutfitCharacter={!!outfitOrigin} demo={page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'?'sharing':page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
+    </section></motion.div> : page==='thank-you' ? <ThankYouSlide key="thank-you"/> : <motion.div key="adventure" className={`presentation-scene ${page==='outfit'||page==='learner'||page==='world'?'outfit-presentation':''}`} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene tourStep={tourPages.includes(page)?page.slice(5):null} hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'||page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'} showGallery={page==='scan-results'} showLeaderboard={page==='leaderboard'} showOutfit={page==='outfit'||page==='learner'||page==='world'} showLearner={page==='learner'||page==='world'} showFinale={page==='world'} finaleOrigin={worldOrigin} hideOutfitCharacter={!!outfitOrigin} demo={page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'?'sharing':page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation portraitRef={portraitRef} origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}

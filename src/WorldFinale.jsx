@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { animate, AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
+import { animate, AnimatePresence, motion, useIsPresent, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { useSoundScope } from './audio/useSoundEffects'
 import WorldLandmark from './WorldLandmarks'
 import { cities, finaleTiming as timing, projectCity, wardrobe } from './worldFinaleSequence'
@@ -31,6 +31,7 @@ function FinaleActor({arrival,mapVisible,reduced,children}) {
 
 export default function WorldFinale({origin=null}) {
   const reduced=useReducedMotion()
+  const present=useIsPresent()
   const sound=useSoundScope()
   const canvas=useRef(null),probe=useRef(null)
   const available=useRef(new Set([0]))
@@ -42,9 +43,10 @@ export default function WorldFinale({origin=null}) {
   const [title,setTitle]=useState(false)
   const [ready,setReady]=useState(false)
   useLayoutEffect(()=>{
+    if(!present)return
     const rect=canvas.current.getBoundingClientRect(),hero=probe.current.getBoundingClientRect()
     setArrival(origin?{left:(origin.left+origin.width/2-rect.left)/rect.width*100,top:(origin.top+origin.height/2-rect.top)/rect.height*100,scale:origin.width/hero.width}:{left:50,top:50,scale:1})
-  },[origin])
+  },[origin,present])
   useEffect(()=>{
     let cancelled=false
     Promise.all([...wardrobe.map((outfit,index)=>({src:outfit.src,index})),{src:'/world-finale/world-land.svg'}].map(async asset=>{
@@ -54,7 +56,7 @@ export default function WorldFinale({origin=null}) {
     return()=>{cancelled=true}
   },[])
   useEffect(()=>{
-    if(!ready)return
+    if(!ready||!present)return
     const timers=[]
     const at=(seconds,action)=>timers.push(setTimeout(action,seconds*1000))
     wardrobe.slice(1).forEach((outfit,index)=>{
@@ -70,7 +72,7 @@ export default function WorldFinale({origin=null}) {
     at(timing.title,()=>{setTitle(true);sound('sparkle',{volume:.8})})
     at(timing.complete,()=>setPhase('complete'))
     return()=>timers.forEach(clearTimeout)
-  },[ready,sound])
+  },[ready,present,sound])
   const mapVisible=phase!=='wardrobe'
   return <section className="world-finale" aria-label="Duo’s world fashion journey" data-phase={phase} data-costume={wardrobe[costume].id} data-lit-cities={litCities}>
     <div className="finale-canvas" ref={canvas}>
