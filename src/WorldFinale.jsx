@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { animate, AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { useSoundScope } from './audio/useSoundEffects'
 import WorldLandmark from './WorldLandmarks'
 import { cities, finaleTiming as timing, projectCity, wardrobe } from './worldFinaleSequence'
@@ -7,7 +7,27 @@ import './WorldFinale.css'
 
 const ease=[.22,.7,.2,1]
 const destination=projectCity(116.4074,39.9042)
-const destinationPosition={left:`${destination[0]/16}%`,top:`${destination[1]/9.6}%`}
+const destinationPosition={left:destination[0]/16,top:destination[1]/9.6}
+
+function FinaleActor({arrival,mapVisible,reduced,children}) {
+  const entrance=useMotionValue(0),journey=useMotionValue(0)
+  // One shared progress value drives both coordinates, so every frame stays
+  // on the same straight line regardless of easing or the amount of shrink.
+  const left=useTransform([entrance,journey],([enter,travel])=>`${arrival.left+(50-arrival.left)*enter+(destinationPosition.left-50)*travel}%`)
+  const top=useTransform([entrance,journey],([enter,travel])=>`${arrival.top+(50-arrival.top)*enter+(destinationPosition.top-50)*travel}%`)
+  const scale=useTransform([entrance,journey],([enter,travel])=>(arrival.scale+(1-arrival.scale)*enter)*(1-.965*travel))
+  const opacity=useTransform(journey,[0,.6,1],[1,1,0])
+  useEffect(()=>{
+    const control=animate(entrance,1,{duration:reduced?0:.72,ease})
+    return()=>control.stop()
+  },[entrance,reduced])
+  useEffect(()=>{
+    if(!mapVisible)return
+    const control=animate(journey,1,{duration:reduced?0:timing.pullbackDuration,ease})
+    return()=>control.stop()
+  },[journey,mapVisible,reduced])
+  return <motion.div className="finale-actor" style={{left,top,scale,opacity,rotate:0}}>{children}</motion.div>
+}
 
 export default function WorldFinale({origin=null}) {
   const reduced=useReducedMotion()
@@ -23,7 +43,7 @@ export default function WorldFinale({origin=null}) {
   const [ready,setReady]=useState(false)
   useLayoutEffect(()=>{
     const rect=canvas.current.getBoundingClientRect(),hero=probe.current.getBoundingClientRect()
-    setArrival(origin?{left:`${(origin.left+origin.width/2-rect.left)/rect.width*100}%`,top:`${(origin.top+origin.height/2-rect.top)/rect.height*100}%`,scale:origin.width/hero.width}:{left:'50%',top:'50%',scale:1})
+    setArrival(origin?{left:(origin.left+origin.width/2-rect.left)/rect.width*100,top:(origin.top+origin.height/2-rect.top)/rect.height*100,scale:origin.width/hero.width}:{left:50,top:50,scale:1})
   },[origin])
   useEffect(()=>{
     let cancelled=false
@@ -52,9 +72,6 @@ export default function WorldFinale({origin=null}) {
     return()=>timers.forEach(clearTimeout)
   },[ready,sound])
   const mapVisible=phase!=='wardrobe'
-  const actorAnimation=mapVisible?{
-    ...destinationPosition,scale:.035,opacity:[1,1,0],rotate:0,
-  }:{left:'50%',top:'50%',scale:1,opacity:1,rotate:0}
   return <section className="world-finale" aria-label="Duo’s world fashion journey" data-phase={phase} data-costume={wardrobe[costume].id} data-lit-cities={litCities}>
     <div className="finale-canvas" ref={canvas}>
       <motion.svg className="finale-world-map" viewBox="0 0 1600 960" role="img" aria-label="World map with Paris, Tokyo, Seoul, Rome, Beijing, Madrid and Los Angeles" initial={{opacity:0,scale:1.04}} animate={{opacity:mapVisible?1:0,scale:mapVisible?1:1.04}} transition={{duration:reduced?0:timing.pullbackDuration,ease}} style={{transformOrigin:'78% 40%'}}>
@@ -81,9 +98,9 @@ export default function WorldFinale({origin=null}) {
         })}
       </motion.svg>
       <div ref={probe} className="finale-actor-size" aria-hidden="true"/>
-      {arrival&&<motion.div className="finale-actor" initial={{...arrival,opacity:1}} animate={reduced?(mapVisible?{...destinationPosition,scale:.06,opacity:0}:{left:'50%',top:'50%',scale:1,opacity:1}):actorAnimation} transition={{duration:reduced?0:mapVisible?timing.pullbackDuration:.72,ease,opacity:{duration:reduced?0:mapVisible?timing.pullbackDuration:.72,times:mapVisible?[0,.6,1]:undefined,ease:'easeOut'}}}>
+      {arrival&&<FinaleActor arrival={arrival} mapVisible={mapVisible} reduced={reduced}>
         <motion.div className="finale-ground" initial={{opacity:0}} animate={{opacity:mapVisible?0:1}} transition={{duration:.4}}/>
-        <motion.div className="finale-dressing-body" animate={reduced||mapVisible?{rotate:0,y:0,scaleX:1,scaleY:1}:dressing?{rotate:[0,-8,10,-3,0],y:[0,13,-15,5,0],scaleX:[1,.82,.9,1.02,1],scaleY:[1,.94,1.03,.99,1]}:{rotate:[0,.7,0,-.7,0],y:[0,-4,0,-2,0],scaleX:1,scaleY:1}} transition={reduced||mapVisible?{duration:reduced?0:.2}:dressing?{duration:timing.dressingDuration,ease:'easeInOut'}:{duration:3.5,repeat:Infinity,ease:'easeInOut'}}>
+        <motion.div className="finale-dressing-body" animate={reduced||mapVisible?{rotate:0,y:0,scaleX:1,scaleY:1}:dressing?{rotate:[0,-8,10,-3,0],y:[0,13,-15,5,0],scaleX:[1,.82,.9,1.02,1],scaleY:[1,.94,1.03,.99,1]}:{rotate:[0,.7,0,-.7,0],y:[0,-4,0,-2,0],scaleX:1,scaleY:1}} transition={reduced||mapVisible?{duration:0}:dressing?{duration:timing.dressingDuration,ease:'easeInOut'}:{duration:3.5,repeat:Infinity,ease:'easeInOut'}}>
           <AnimatePresence initial={false}>
             <motion.img className="finale-costume" key={wardrobe[costume].id} src={wardrobe[costume].src} alt={wardrobe[costume].alt} draggable="false" initial={{opacity:0,y:reduced?0:10,scale:reduced?1:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:reduced?0:-7,scale:reduced?1:.98}} transition={{duration:reduced?0:.2,ease:'easeOut'}}/>
           </AnimatePresence>
@@ -92,7 +109,7 @@ export default function WorldFinale({origin=null}) {
           <path d="M57 290Q20 230 56 178M435 352q38 38 19 79" fill="none" stroke="#edc46c" strokeWidth="5" strokeLinecap="round"/>
           <path d="m49 161 4 13 13 4-13 4-4 13-4-13-13-4 13-4 4-13Zm402 264 3 10 10 3-10 3-3 10-3-10-10-3 10-3 3-10Z" fill="#f5cb5b"/>
         </motion.svg>
-      </motion.div>}
+      </FinaleActor>}
     </div>
     <motion.h2 className="finale-title" aria-hidden={!title} initial={{opacity:0,y:reduced?0:18,scale:reduced?1:.95}} animate={{opacity:title?1:0,y:title?0:18,scale:title?1:.95}} transition={{duration:reduced?0:.8,type:'spring',bounce:.16}}>From Paris to <span>World</span></motion.h2>
     <span className="finale-screenreader" aria-live="polite">{title?'From Paris to World':mapVisible?'Duo travels into China. Cities around the world light up.':wardrobe[costume].alt}</span>

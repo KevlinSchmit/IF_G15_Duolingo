@@ -19,8 +19,9 @@ export const cities=[
   {id:'los-angeles',name:'Los Angeles',coordinates:[-118.2437,34.0522],label:[265,350],color:'#6c9fa6'},
 ]
 
-// Each costume has an unhurried hold; the final hanfu gets an extra beat.
-const pullback=11.2,pullbackDuration=1.05
+// A slightly brisker wardrobe sequence; the final hanfu still gets an extra beat.
+const firstChange=.95,outfitInterval=1.65,dressingDuration=.7
+const pullback=firstChange+(wardrobe.length-2)*outfitInterval+2.15,pullbackDuration=1.05
 const cityStart=pullback+pullbackDuration+.15,cityInterval=.67
 const title=cityStart+cities.length*cityInterval+.25
-export const finaleTiming={firstChange:1.1,outfitInterval:1.9,costumeSwap:.29,dressingDuration:.82,pullback,pullbackDuration,cityStart,cityInterval,title,complete:title+1.2}
+export const finaleTiming={firstChange,outfitInterval,costumeSwap:.25,dressingDuration,pullback,pullbackDuration,cityStart,cityInterval,title,complete:title+1.2}
