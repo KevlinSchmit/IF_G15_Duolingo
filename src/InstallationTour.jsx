@@ -4,7 +4,7 @@ import './InstallationTour.css'
 const details={
   kiosks:{title:'Check-in & Check-out Kiosks',description:'Activate and complete your visit',photo:'/installation-kiosk-photo.png',photoAlt:'Two physical Duolingo kiosks, numbered 01 and 02, showing Duo and Check in and Check out buttons inside the French fashion installation'},
   clothing:{title:'Clothing Stations',description:'Find correct items',photo:'/installation-clothing-photo.png',photoAlt:'The French fashion installation clothing station, with cream shelves of hats, scarves and shoes beside rails of striped shirts, red jackets, navy coats and tote bags'},
-  duomart:{title:'Duomart',description:'Duolingo merchandise & souvenirs'},
+  duomart:{title:'Duomart',description:'Duolingo merchandise & souvenirs',photo:'/installation-duomart-photo.png',photoAlt:'The Duomart souvenir display with French Duo plush toys, tote bags, berets, caps, scarves, mugs, postcards, stickers and keyrings'},
 }
 
 export default function InstallationTour({step}) {

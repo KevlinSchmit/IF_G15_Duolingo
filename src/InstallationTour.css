@@ -6,6 +6,7 @@
 .artwork-tour-softened{filter:blur(1.5px)}
 .installation-tour-photo{position:absolute;top:26%;right:3%;width:39%;margin:0;padding:10px;border:3px solid #fff;border-radius:22px;background:#fff;box-shadow:0 8px 0 #285e9b20,0 15px 35px #285e9b20;transform-origin:50% 70%}
 .installation-tour-photo img{display:block;width:100%;height:auto;border-radius:12px}
+.installation-tour-duomart .installation-tour-photo{left:3%;right:auto}
 @media(max-width:750px){
   .installation-tour-caption{padding:7px 10px;border-radius:10px;max-width:90%}
   .installation-tour-caption h2{font-size:clamp(12px,3.4vw,22px)}
