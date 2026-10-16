@@ -4,6 +4,7 @@ import CamilleIdle from './CamilleIdle'
 import ForegroundDuo from './ForegroundDuo'
 import KioskVideoPanel from './KioskVideoPanel'
 import OutfitDetail from './OutfitDetail'
+import WorldFinale from './WorldFinale'
 import InstallationOverview from './InstallationOverview'
 import InstallationTour from './InstallationTour'
 import SceneAtmosphere from './SceneAtmosphere'
@@ -42,7 +43,7 @@ const cameraPositions={
   sharing:{scale:1.85,x:'-112%',y:'-36.55%'},
 }
 
-export default function AdventureScene({hideCharacter=false,focused=false,tourStep=null,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showLeaderboard=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false}) {
+export default function AdventureScene({hideCharacter=false,focused=false,tourStep=null,onSelectKiosk,videoReplay=0,demo='proficiency',showGallery=false,showLeaderboard=false,showOutfit=false,showLearner=false,hideOutfitCharacter=false,showFinale=false,finaleOrigin=null}) {
   const reduced=useReducedMotion()
   const tourCloseup=!!tourStep&&tourStep!=='overview'
   const cameraView=tourCloseup?`tour-${tourStep}`:!focused?'overview':demo==='sharing'?'sharing':demo==='scan'&&!showGallery?'clothing':'kiosks'
@@ -79,6 +80,7 @@ export default function AdventureScene({hideCharacter=false,focused=false,tourSt
     </svg>}
     </motion.div>
     <AnimatePresence>{tourCloseup&&<InstallationTour key={tourStep} step={tourStep}/>}</AnimatePresence>
-    <AnimatePresence mode="wait">{showOutfit ? <OutfitDetail key="outfit" hideCharacter={hideOutfitCharacter} replay={videoReplay} showLearner={showLearner}/> : focused&&cameraReady&&<KioskVideoPanel key="demo-panel" demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
+    <AnimatePresence mode="wait">{showOutfit ? <motion.div key="outfit" className="outfit-continuity" initial={false} animate={{opacity:showFinale?0:1}} transition={{duration:reduced?0:.35}} aria-hidden={showFinale}><OutfitDetail hideCharacter={hideOutfitCharacter||showFinale} replay={videoReplay} showLearner={showLearner}/></motion.div> : focused&&cameraReady&&<KioskVideoPanel key="demo-panel" demo={demo} showGallery={showGallery} showLeaderboard={showLeaderboard} galleryReplay={videoReplay}/>}</AnimatePresence>
+    {showFinale&&<WorldFinale key={`world-${videoReplay}`} origin={finaleOrigin}/>}
   </div></section>
 }

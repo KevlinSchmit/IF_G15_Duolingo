@@ -11,6 +11,7 @@ import DiscoveryPoster from './DiscoveryPoster'
 import { Flowers, Sunglasses, Scarf, Tower } from './FrenchAccessories'
 import SoundToggle from './SoundToggle'
 import { usePresentationSound } from './audio/useSoundEffects'
+import { wardrobe } from './worldFinaleSequence'
 
 function Spark({className}) {return <svg className={className} viewBox="0 0 60 60" aria-hidden="true"><path d="M30 0c3 21 9 27 30 30-21 3-27 9-30 30C27 39 21 33 0 30 21 27 27 21 30 0Z" fill="currentColor"/></svg>}
 
@@ -21,7 +22,7 @@ function Floating({className, children, delay = 0, rotation = 0, reduced}) {
 }
 const tourPages=['tour-kiosks','tour-clothing','tour-duomart','tour-overview']
 const members=['Leanne Wang','Beatrice Madden','Makeda West','Thomas Du','Reagan Sacks']
-const slides=['opening','camille','discovery','adventure',...tourPages,'proficiency','clothing','scan','scan-results','sharing','leaderboard','outfit','learner']
+const slides=['opening','camille','discovery','adventure',...tourPages,'proficiency','clothing','scan','scan-results','sharing','leaderboard','outfit','learner','world']
 
 export default function App() {
   const reduced = useReducedMotion()
@@ -34,6 +35,7 @@ export default function App() {
   const portraitRef = useRef(null)
   const [transformOrigin,setTransformOrigin] = useState(null)
   const [outfitOrigin,setOutfitOrigin]=useState(null)
+  const [worldOrigin,setWorldOrigin]=useState(null)
   const transitionLock = useRef(false)
   const startJourney = useCallback(() => {
     if (transitionLock.current || page !== 'opening') return
@@ -78,20 +80,26 @@ export default function App() {
     setPage('outfit')
   },[page,reduced])
   useEffect(()=>{
-    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:[]
+    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:page==='learner'?[...wardrobe.map(outfit=>outfit.src),'/world-finale/world-land.svg']:[]
     sources.forEach(src=>{const image=new Image();image.src=src;image.decode().catch(()=>{})})
   },[page])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
+  const startWorld=useCallback(()=>{
+    if(transitionLock.current||page!=='learner')return
+    const source=document.querySelector('.outfit-duo-target')?.getBoundingClientRect()
+    setWorldOrigin(source?{left:source.left,top:source.top,width:source.width,height:source.height}:null)
+    setPage('world')
+  },[page])
   const goBack = useCallback(() => {if(!transitionLock.current)setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])}, [])
   useEffect(() => {
     const onKey = event => {
       if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'learner') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startDiscovery();else if(page==='discovery')startTransformation();else if(page==='adventure'||tourPages.includes(page))startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else startLearner()}
+      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'world') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startDiscovery();else if(page==='discovery')startTransformation();else if(page==='adventure'||tourPages.includes(page))startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else if(page==='outfit')startLearner();else startWorld()}
       if (event.key === 'ArrowLeft') goBack()
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
-  }, [page,startJourney,startDiscovery,startTransformation,startKiosk,startClothing,startScan,startScanResults,startSharing,startLeaderboard,startOutfit,startLearner,goBack])
+  }, [page,startJourney,startDiscovery,startTransformation,startKiosk,startClothing,startScan,startScanResults,startSharing,startLeaderboard,startOutfit,startLearner,startWorld,goBack])
   const [fullscreen,setFullscreen] = useState(false)
   useEffect(() => {
     const sync = () => setFullscreen(Boolean(document.fullscreenElement))
@@ -111,14 +119,15 @@ export default function App() {
     else if (page==='sharing') startLeaderboard()
     else if (page==='leaderboard') startOutfit()
     else if (page==='outfit') startLearner()
-    else setVideoReplay(current => current+1)
+    else if (page==='learner') startWorld()
+    else {setWorldOrigin(null);setVideoReplay(current => current+1)}
   }
   const enterFullscreen = async () => {
     if (document.fullscreenElement) await document.exitFullscreen()
     else await document.documentElement.requestFullscreen?.()
     setFullscreen(Boolean(document.fullscreenElement))
   }
-  return <main className={`profile-page ${page==='discovery'?'profile-poster-page':''} ${page==='outfit'||page==='learner'?'outfit-page':''} ${transitionOrigin || transformOrigin || outfitOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${!['opening','camille','discovery'].includes(page) ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
+  return <main className={`profile-page ${page==='discovery'?'profile-poster-page':''} ${page==='outfit'||page==='learner'||page==='world'?'outfit-page':''} ${transitionOrigin || transformOrigin || outfitOrigin ? 'is-transitioning' : ''} ${transformOrigin ? 'transformation-active' : ''} ${!['opening','camille','discovery'].includes(page) ? 'adventure-page' : ''}`} aria-busy={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={event=>{if(!event.target.closest('button, a, [role="button"]'))advance()}}>
     <header className="masthead"><span className="wordmark">duolingo</span><div className="masthead-actions"><SoundToggle/><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></div></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
@@ -152,11 +161,11 @@ export default function App() {
         <Floating className="spark-white" delay={1} reduced={reduced}><Spark/></Floating>
         <Floating className="little-heart" delay={1.2} rotation={-12} reduced={reduced}>♥</Floating>
       </div>
-    </section></motion.div> : <motion.div key="adventure" className="presentation-scene" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene tourStep={tourPages.includes(page)?page.slice(5):null} hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'||page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'} showGallery={page==='scan-results'} showLeaderboard={page==='leaderboard'} showOutfit={page==='outfit'||page==='learner'} showLearner={page==='learner'} hideOutfitCharacter={!!outfitOrigin} demo={page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'?'sharing':page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
+    </section></motion.div> : <motion.div key="adventure" className="presentation-scene" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .25}}><AdventureScene tourStep={tourPages.includes(page)?page.slice(5):null} hideCharacter={!!transformOrigin} focused={page==='proficiency'||page==='clothing'||page==='scan'||page==='scan-results'||page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'} showGallery={page==='scan-results'} showLeaderboard={page==='leaderboard'} showOutfit={page==='outfit'||page==='learner'||page==='world'} showLearner={page==='learner'||page==='world'} showFinale={page==='world'} finaleOrigin={worldOrigin} hideOutfitCharacter={!!outfitOrigin} demo={page==='sharing'||page==='leaderboard'||page==='outfit'||page==='learner'||page==='world'?'sharing':page==='scan'||page==='scan-results'?'scan':page==='clothing'?'clothing':'proficiency'} onSelectKiosk={startKiosk} videoReplay={videoReplay}/></motion.div>}
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation portraitRef={portraitRef} origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
     {outfitOrigin&&<OutfitZoom origin={outfitOrigin} onReveal={()=>setPage('outfit')} onComplete={()=>{setOutfitOrigin(null);transitionLock.current=false}}/>}
-    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin || !!outfitOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Discover the installation' : page==='discovery' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore the kiosks' : page==='tour-kiosks' ? 'Explore the clothing stations' : page==='tour-clothing' ? 'Visit Duomart' : page==='tour-duomart' ? 'Back to the full installation' : page==='tour-overview' ? 'Start Personalized Learning' : page==='proficiency' ? 'Receive a Prompt' : page==='clothing' ? 'Scan and Receive Feedback' : page==='scan' ? 'See scan results' : page==='scan-results' ? 'Save Your Outfit' : page==='sharing' ? 'See the community leaderboard' : page==='leaderboard' ? 'Explore the winning outfit' : page==='outfit' ? 'See Emma’s progress' : 'Replay the labels'} <span aria-hidden="true">{page === 'learner' ? '↻' : '→'}</span></button><span className="page-number">{String(slides.indexOf(page)+1).padStart(2,'0')} <span>/ {slides.length}</span></span></footer>
+    <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin || !!outfitOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Discover the installation' : page==='discovery' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore the kiosks' : page==='tour-kiosks' ? 'Explore the clothing stations' : page==='tour-clothing' ? 'Visit Duomart' : page==='tour-duomart' ? 'Back to the full installation' : page==='tour-overview' ? 'Start Personalized Learning' : page==='proficiency' ? 'Receive a Prompt' : page==='clothing' ? 'Scan and Receive Feedback' : page==='scan' ? 'See scan results' : page==='scan-results' ? 'Save Your Outfit' : page==='sharing' ? 'See the community leaderboard' : page==='leaderboard' ? 'Explore the winning outfit' : page==='outfit' ? 'See Emma’s progress' : page==='learner' ? 'From Paris to World' : 'Replay the journey'} <span aria-hidden="true">{page === 'world' ? '↻' : '→'}</span></button><span className="page-number">{String(slides.indexOf(page)+1).padStart(2,'0')} <span>/ {slides.length}</span></span></footer>
   </main>
 }
