@@ -1,5 +1,6 @@
 function NoteIcon({type}) {
   const paths={
+    checkin:<><rect x="5" y="3" width="14" height="13" rx="2"/><path d="M12 16v5m-4 0h8m-8-11 3 3 5-6"/></>,
     account:<><path d="M4 8V4h4m8 0h4v4M4 16v4h4m12-4v4h-4"/><circle cx="12" cy="9" r="2.5"/><path d="M7.5 17c.5-4 8.5-4 9 0"/></>,
     challenge:<><rect x="5" y="3" width="14" height="18" rx="3"/><path d="m12 7 1.2 2.5 2.8.4-2 2 .5 2.8-2.5-1.3-2.5 1.3.5-2.8-2-2 2.8-.4L12 7ZM9 18h6"/></>,
     learn:<><path d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v14"/></>,

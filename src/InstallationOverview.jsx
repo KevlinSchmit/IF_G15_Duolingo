@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import './InstallationOverview.css'
 
 const stations = [
-  {id:'kiosks',title:'Interactive Kiosks',description:'Receive French challenges',path:'M800 300V330Q800 345 790 355L708 428',x:708,y:428},
+  {id:'kiosks',title:'Check-in & Check-out Kiosks',description:'Activate and complete your visit',path:'M800 300V330Q800 345 790 355L708 428',x:708,y:428},
   {id:'clothing',title:'Clothing Stations',description:'Find correct items',path:'M233 363V411Q233 424 241 441L268 496',x:268,y:496},
   {id:'duomart',title:'Duomart',description:'Duolingo merchandise & souvenirs',path:'M1394 170V199Q1394 211 1399 222L1420 271',x:1420,y:271},
 ]

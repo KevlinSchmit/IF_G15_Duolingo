@@ -11,7 +11,7 @@
 .installation-callout{position:absolute;padding:10px 16px;background:#fffffff0;border-radius:17px;box-shadow:0 3px 10px #27527b1c}
 .installation-callout h3{margin:0;font-size:clamp(17px,1.8vw,25px);font-weight:900;line-height:1.1;letter-spacing:-.4px}
 .installation-callout p{margin:5px 0 0;font-size:clamp(11px,1.05vw,15px);font-weight:800;line-height:1.25;color:#527493}
-.installation-kiosks{top:25%;left:40%;width:22%;text-align:center}
+.installation-kiosks{top:22%;left:36%;width:30%;text-align:center}
 .installation-clothing{top:31%;left:4%;width:23%}
 .installation-duomart{top:10%;right:3%;width:23%;text-align:center}
 @media(max-width:750px){
