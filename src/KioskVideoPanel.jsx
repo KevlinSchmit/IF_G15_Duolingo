@@ -22,8 +22,8 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
   const [needsPlay,setNeedsPlay]=useState(false)
   const [leaderboardAspect,setLeaderboardAspect]=useState(3/2)
   const landscapeLeaderboard=leaderboardAspect>1
-  const cues=showGallery?[]:showLeaderboard?[{name:'award',delay:.25,volume:.65}]:demo==='scan'?[{name:'whoosh',volume:.5}]:demo==='sharing'?[{name:'share',delay:.22,volume:.8}]:demo==='clothing'?[{name:'prompt',delay:.22,volume:.7}]:[{name:'pop',delay:.08,volume:.8}]
-  useSoundSequence(`${demo}-${showGallery}-${showLeaderboard}`,cues)
+  // One shared entrance motif for numbered steps 1–4; continuations keep it quiet.
+  useSoundSequence(demo,[{name:'step',delay:.2,volume:.8}])
   const playVideo=()=>{
     const video=videoRef.current
     if(!video)return

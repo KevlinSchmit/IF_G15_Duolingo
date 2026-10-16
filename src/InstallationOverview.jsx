@@ -1,4 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react'
+import { useRef } from 'react'
+import { useSoundScope } from './audio/useSoundEffects'
 import './InstallationOverview.css'
 
 const stations = [
@@ -7,8 +9,16 @@ const stations = [
   {id:'duomart',title:'Duomart',description:'Duolingo merchandise & souvenirs',path:'M1394 170V199Q1394 211 1399 222L1420 271',x:1420,y:271},
 ]
 
-export default function InstallationOverview() {
+export default function InstallationOverview({active=true}) {
   const reduced=useReducedMotion()
+  const sound=useSoundScope()
+  const announced=useRef(new Set())
+  const announce=(id,index,opacity)=>{
+    const visibility=Number(opacity)
+    if(!Number.isFinite(visibility)||visibility<=.12||announced.current.has(id))return
+    announced.current.add(id)
+    if(active)sound('label',{volume:.65,pitch:[1,1.12246,1.25992][index]})
+  }
   return <div className="installation-overview">
     <motion.header className="installation-intro" initial={reduced?false:{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{delay:reduced?0:.9,duration:.4}}>
       <h2 className="installation-heading">Inside the Installation</h2>
@@ -20,7 +30,7 @@ export default function InstallationOverview() {
         <motion.circle cx={station.x} cy={station.y} r="8" initial={reduced?false:{opacity:0}} animate={{opacity:1}} transition={{delay:reduced?0:1.7+index*.6,duration:reduced?0:.25}}/>
       </motion.g>)}
     </svg>
-    {stations.map((station,index)=><motion.div key={station.id} className={`installation-callout installation-${station.id}`} initial={reduced?false:{opacity:0,y:8,scale:.985}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:1.32+index*.6,duration:reduced?0:.55,ease:[.22,1,.36,1]}}>
+    {stations.map((station,index)=><motion.div key={station.id} className={`installation-callout installation-${station.id}`} initial={reduced?false:{opacity:0,y:8,scale:.985}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:1.32+index*.6,duration:reduced?0:.55,ease:[.22,1,.36,1]}} onUpdate={values=>announce(station.id,index,values.opacity)}>
       <h3>{station.title}</h3><p>{station.description}</p>
     </motion.div>)}
   </div>
