@@ -13,7 +13,7 @@
 .installation-callout p{margin:5px 0 0;font-size:clamp(11px,1.05vw,15px);font-weight:800;line-height:1.25;color:#527493}
 .installation-kiosks{top:22%;left:36%;width:30%;text-align:center}
 .installation-clothing{top:31%;left:4%;width:23%}
-.installation-duomart{top:10%;right:3%;width:23%;text-align:center}
+.installation-duomart{top:10%;right:3%;width:23%;text-align:center;scale:.82;transform-origin:50% 100%}
 @media(max-width:750px){
   .installation-leaders .installation-leader-halo{stroke-width:4}
   .installation-leaders .installation-leader-stroke{stroke-width:1.7}
