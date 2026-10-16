@@ -1,0 +1,71 @@
+/* Give the installation and its panels the space previously used by the chrome. */
+.profile-page.adventure-page{
+  height:100svh;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:38px minmax(0,1fr) 38px;
+  padding:12px 2vw 8px;
+}
+.adventure-page .presentation-scene,.adventure-page .adventure-scene{height:100%;min-height:0;min-width:0}
+.adventure-page .adventure-stage{width:min(100%,calc((100svh - 104px)*16/9))}
+.adventure-page .wordmark{font-size:29px}
+.adventure-page .fullscreen-button{width:32px;height:32px}
+.adventure-page footer{margin:0;padding-top:5px;letter-spacing:1px}
+.adventure-page .back-button,.adventure-page .replay-button>span{width:27px;height:27px;font-size:19px}
+.adventure-page .replay-button{gap:8px;padding:2px;font-size:12px}
+
+/* Panels share one size; the scan demonstration and leaderboard expand further. */
+.adventure-page .kiosk-video-panel{width:69%;right:2.5%;padding:24px;max-height:calc(100% - 24px)}
+.adventure-page .kiosk-video-panel h2{font-size:clamp(25px,2.9vw,42px)}
+.adventure-page .kiosk-step-number{font-size:clamp(50px,4.8vw,70px)}
+.adventure-page .panel-notes li{font-size:clamp(13px,1.14vw,17px)}
+.adventure-page .panel-note-icon{width:29px;height:29px}
+.adventure-page .panel-note-icon svg{width:21px;height:21px}
+.adventure-page .sharing-outfit-panel{width:80%}
+.adventure-page .scan-feedback-panel,.adventure-page .landscape-leaderboard-panel{width:95%;right:2.5%}
+.adventure-page .scan-feedback-panel .nfc-phone-sticker{right:5px}
+.adventure-page .scan-feedback-panel .nfc-sticker-label{right:135px}
+.adventure-page .outfit-intro .outfit-heading{font-size:clamp(26px,2.9vw,42px)}
+.adventure-page .outfit-subtitle{font-size:clamp(14px,1.35vw,20px);max-width:1120px}
+.adventure-page .outfit-word{font-size:39px}
+.adventure-page .outfit-translation{font-size:28px}
+.adventure-page.outfit-page .adventure-stage.focused-stage{width:100%;height:100%;aspect-ratio:auto}
+.adventure-page .outfit-detail{grid-template-columns:minmax(0,1fr)}
+
+@media(min-width:751px) and (max-height:700px){
+  .adventure-page .kiosk-video-panel{padding:16px}
+  .adventure-page .kiosk-panel-heading{gap:12px;margin-bottom:12px}
+  .adventure-page .kiosk-video-panel h2{font-size:clamp(24px,2.9vw,36px)}
+  .adventure-page .kiosk-step-number{font-size:46px}
+  .adventure-page .panel-notes{gap:5px;margin-top:11px}
+  .adventure-page .panel-notes li{font-size:13px}
+  .adventure-page .panel-note-icon{width:24px;height:24px}
+  .adventure-page .panel-note-icon svg{width:18px;height:18px}
+}
+@media(max-width:750px){
+  .profile-page.adventure-page{padding:10px 12px 6px;grid-template-rows:34px minmax(0,1fr) 36px}
+  .adventure-page .adventure-stage{width:100%}
+  .adventure-page .adventure-stage.focused-stage{max-height:100%;aspect-ratio:4/5}
+  .adventure-page .kiosk-video-panel,.adventure-page .sharing-outfit-panel{width:98%;right:1%;padding:12px;max-height:calc(100% - 16px)}
+  .adventure-page .kiosk-panel-heading{gap:9px;margin-bottom:12px}
+  .adventure-page .kiosk-video-panel h2{font-size:24px}
+  .adventure-page .kiosk-step-number{font-size:45px}
+  .adventure-page .panel-notes{margin-top:12px;gap:8px}
+  .adventure-page .panel-notes li{font-size:12px;gap:7px}
+  .adventure-page .panel-note-icon{width:24px;height:24px}
+  .adventure-page .panel-note-icon svg{width:18px;height:18px}
+  .adventure-page .has-nfc-sticker .kiosk-panel-heading h2{font-size:21px}
+  .adventure-page .scan-feedback-panel .nfc-phone-sticker{right:10px}
+  .adventure-page .scan-feedback-panel .nfc-sticker-label{right:84px}
+  .adventure-page .outfit-intro .outfit-heading{font-size:clamp(20px,5vw,25px)}
+  .adventure-page .outfit-subtitle{font-size:13px}
+  .adventure-page .outfit-word{font-size:36px}
+  .adventure-page .outfit-translation{font-size:31px}
+  .adventure-page .replay-button{font-size:11px;gap:6px}
+}
+@media(max-width:380px){
+  .adventure-page .kiosk-video-panel h2{font-size:22px}
+  .adventure-page .has-nfc-sticker .kiosk-panel-heading h2{font-size:20px}
+  .adventure-page .panel-notes li{font-size:11.5px}
+}
