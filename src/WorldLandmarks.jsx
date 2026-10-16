@@ -47,6 +47,19 @@ export default function WorldLandmark({city}) {
     <path d="M60 17v10" stroke="#d5a549" strokeWidth="4" strokeLinecap="round"/><circle cx="60" cy="16" r="4" fill="#ffc64e"/>
     <path d="M40 91v10m13-10v10m14-10v10m13-10v10" stroke="#f9d6a0" strokeWidth="4"/>
   </svg>
+  if(city==='los-angeles')return <svg {...props}>
+    <ellipse cx="60" cy="118" rx="53" ry="5" fill="#d9e8e8"/>
+    <path d="M9 108h102v8H9zM17 102h86v7H17z" fill="#d2d8cc"/>
+    <path d="M19 74h82v29H19z" fill="#f0d9b7"/><path d="M43 59h34v44H43z" fill="#f7e7ce"/>
+    <path d="M40 61a20 20 0 0 1 40 0Z" fill="#7da8a9"/><path d="M41 61h38" stroke="#578487" strokeWidth="4" strokeLinecap="round"/>
+    <path d="M13 77a12 12 0 0 1 24 0Zm70 0a12 12 0 0 1 24 0Z" fill="#7da8a9"/>
+    <path d="M13 78h24m46 0h24" stroke="#578487" strokeWidth="4" strokeLinecap="round"/>
+    <path d="M53 103V85c0-9 14-9 14 0v18Z" fill="#6c9396"/>
+    <path d="M26 87v10m10-10v10m48-10v10m10-10v10" stroke="#b69979" strokeWidth="4"/>
+    <path d="M60 34v7" stroke="#578487" strokeWidth="3" strokeLinecap="round"/>
+    <path d="m8 93 1-36m0 0q-8-3-8 5m8-5q4-9 10-3m-10 3q-6-10-11-5m11 5q9-2 11 4" stroke="#7dab75" strokeWidth="3.5" strokeLinecap="round"/>
+    <path d="m109 102 2-38m0 0q-8-3-9 4m9-4q4-9 10-3m-10 3q-6-9-11-5m11 5q8-1 10 5" stroke="#7dab75" strokeWidth="3.5" strokeLinecap="round"/>
+  </svg>
   return <svg {...props}>
     <ellipse cx="60" cy="117" rx="52" ry="5" fill="#e6dece"/>
     <path d="M13 62h94v51H13z" fill="#e6c69b"/><path d="M9 60h102v9H9zM9 108h102v7H9z" fill="#d3ab78"/>

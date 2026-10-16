@@ -53,13 +53,11 @@ export default function WorldFinale({origin=null}) {
   },[ready,sound])
   const mapVisible=phase!=='wardrobe'
   const actorAnimation=mapVisible?{
-    left:['50%','56%',destinationPosition.left,destinationPosition.left],
-    top:['50%','46%',destinationPosition.top,destinationPosition.top],
-    scale:[1,.67,.1,.035],opacity:[1,1,.9,0],rotate:[0,-3,1,0],
+    ...destinationPosition,scale:.035,opacity:[1,1,0],rotate:0,
   }:{left:'50%',top:'50%',scale:1,opacity:1,rotate:0}
   return <section className="world-finale" aria-label="Duo’s world fashion journey" data-phase={phase} data-costume={wardrobe[costume].id} data-lit-cities={litCities}>
     <div className="finale-canvas" ref={canvas}>
-      <motion.svg className="finale-world-map" viewBox="0 0 1600 960" role="img" aria-label="World map with Paris, Tokyo, Seoul, Rome, Beijing and Madrid" initial={{opacity:0,scale:1.16}} animate={{opacity:mapVisible?1:0,scale:mapVisible?1:1.16}} transition={{duration:reduced?0:2.4,ease}} style={{transformOrigin:'78% 40%'}}>
+      <motion.svg className="finale-world-map" viewBox="0 0 1600 960" role="img" aria-label="World map with Paris, Tokyo, Seoul, Rome, Beijing, Madrid and Los Angeles" initial={{opacity:0,scale:1.04}} animate={{opacity:mapVisible?1:0,scale:mapVisible?1:1.04}} transition={{duration:reduced?0:timing.pullbackDuration,ease}} style={{transformOrigin:'78% 40%'}}>
         <defs><radialGradient id="finale-ocean"><stop stopColor="#eaf7fc"/><stop offset="1" stopColor="#f5fbfd"/></radialGradient></defs>
         <ellipse cx="800" cy="491" rx="775" ry="350" fill="url(#finale-ocean)"/>
         <g className="finale-graticule" stroke="#cee5eb" opacity=".45" fill="none" strokeWidth="1.2">
@@ -77,15 +75,15 @@ export default function WorldFinale({origin=null}) {
             <motion.g initial={{opacity:0,y:reduced?0:12,scale:reduced?1:.85}} animate={{opacity:lit?1:0,y:lit?0:12,scale:lit?1:.85}} transition={{duration:reduced?0:.6,type:'spring',bounce:.18}} style={{transformOrigin:`${lx}px ${ly+60}px`}}>
               <ellipse cx={lx} cy={ly+36} rx="81" ry="83" fill="white" opacity=".76"/>
               <g transform={`translate(${lx-62} ${ly-49}) scale(1.03)`}><WorldLandmark city={city.id}/></g>
-              <text className="finale-city-name" x={lx} y={ly+105} fill={city.color} textAnchor="middle">{city.name}</text>
+              <text className={`finale-city-name ${city.id==='los-angeles'?'finale-city-name-long':''}`} x={lx} y={ly+105} fill={city.color} textAnchor="middle">{city.name}</text>
             </motion.g>
           </g>
         })}
       </motion.svg>
       <div ref={probe} className="finale-actor-size" aria-hidden="true"/>
-      {arrival&&<motion.div className="finale-actor" initial={{...arrival,opacity:1}} animate={reduced?(mapVisible?{...destinationPosition,scale:.06,opacity:0}:{left:'50%',top:'50%',scale:1,opacity:1}):actorAnimation} transition={{duration:reduced?0:mapVisible?3.15:.72,ease:mapVisible?'easeInOut':ease,times:mapVisible?[0,.3,.82,1]:undefined}}>
+      {arrival&&<motion.div className="finale-actor" initial={{...arrival,opacity:1}} animate={reduced?(mapVisible?{...destinationPosition,scale:.06,opacity:0}:{left:'50%',top:'50%',scale:1,opacity:1}):actorAnimation} transition={{duration:reduced?0:mapVisible?timing.pullbackDuration:.72,ease,opacity:{duration:reduced?0:mapVisible?timing.pullbackDuration:.72,times:mapVisible?[0,.6,1]:undefined,ease:'easeOut'}}}>
         <motion.div className="finale-ground" initial={{opacity:0}} animate={{opacity:mapVisible?0:1}} transition={{duration:.4}}/>
-        <motion.div className="finale-dressing-body" animate={reduced||mapVisible?{rotate:0,y:0,scaleX:1,scaleY:1}:dressing?{rotate:[0,-8,10,-3,0],y:[0,13,-15,5,0],scaleX:[1,.82,.9,1.02,1],scaleY:[1,.94,1.03,.99,1]}:{rotate:[0,.7,0,-.7,0],y:[0,-4,0,-2,0],scaleX:1,scaleY:1}} transition={reduced||mapVisible?{duration:0}:dressing?{duration:timing.dressingDuration,ease:'easeInOut'}:{duration:3.5,repeat:Infinity,ease:'easeInOut'}}>
+        <motion.div className="finale-dressing-body" animate={reduced||mapVisible?{rotate:0,y:0,scaleX:1,scaleY:1}:dressing?{rotate:[0,-8,10,-3,0],y:[0,13,-15,5,0],scaleX:[1,.82,.9,1.02,1],scaleY:[1,.94,1.03,.99,1]}:{rotate:[0,.7,0,-.7,0],y:[0,-4,0,-2,0],scaleX:1,scaleY:1}} transition={reduced||mapVisible?{duration:reduced?0:.2}:dressing?{duration:timing.dressingDuration,ease:'easeInOut'}:{duration:3.5,repeat:Infinity,ease:'easeInOut'}}>
           <AnimatePresence initial={false}>
             <motion.img className="finale-costume" key={wardrobe[costume].id} src={wardrobe[costume].src} alt={wardrobe[costume].alt} draggable="false" initial={{opacity:0,y:reduced?0:10,scale:reduced?1:.96}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:reduced?0:-7,scale:reduced?1:.98}} transition={{duration:reduced?0:.2,ease:'easeOut'}}/>
           </AnimatePresence>
