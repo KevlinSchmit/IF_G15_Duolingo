@@ -18,7 +18,7 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
   const videoRef=useRef(null)
   const [ready,setReady]=useState(false)
   const [needsPlay,setNeedsPlay]=useState(false)
-  const [leaderboardAspect,setLeaderboardAspect]=useState(941/1672)
+  const [leaderboardAspect,setLeaderboardAspect]=useState(3/2)
   const landscapeLeaderboard=leaderboardAspect>1
   const playVideo=()=>{
     const video=videoRef.current
@@ -52,7 +52,7 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
     <div className={`proficiency-video-frame ${demo==='sharing'?'sharing-outfit-frame':''}`}>
       <AnimatePresence mode="wait" initial={false}>
         {showGallery ? <ScanResultGallery key={`gallery-${galleryReplay}`}/> : showLeaderboard ? <motion.div key="leaderboard" className="sharing-leaderboard" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:reduced?0:.32,ease:[.22,.7,.2,1]}}>
-          <figure className="sharing-leaderboard-card" data-layout={landscapeLeaderboard?'landscape':'portrait'}><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge community leaderboard, with Emma’s Duo outfit in first place" onLoad={event=>{const image=event.currentTarget;if(image.naturalWidth&&image.naturalHeight)setLeaderboardAspect(image.naturalWidth/image.naturalHeight)}}/><span className="winner-outfit-origin" aria-hidden="true"/></figure>
+          <figure className="sharing-leaderboard-card" data-layout={landscapeLeaderboard?'landscape':'portrait'}><img src="/sharing-fashion-challenge-landscape.png" alt="Paris Fashion Challenge desktop leaderboard: Emma’s Duo outfit in first place, Chloé second and Camille third, with challenge details and recent looks" onLoad={event=>{const image=event.currentTarget;if(image.naturalWidth&&image.naturalHeight)setLeaderboardAspect(image.naturalWidth/image.naturalHeight)}}/><span className="winner-outfit-origin" aria-hidden="true"/></figure>
         </motion.div> : <motion.div key="video" className="scan-video-content" initial={{opacity:0}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:.96}} transition={{duration:reduced?0:.22}}>
           {demo==='sharing' ? <div className="sharing-outfit-media">
             <div className="sharing-video-card">{videoContent}</div>
