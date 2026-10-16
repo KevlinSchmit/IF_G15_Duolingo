@@ -18,6 +18,8 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
   const videoRef=useRef(null)
   const [ready,setReady]=useState(false)
   const [needsPlay,setNeedsPlay]=useState(false)
+  const [leaderboardAspect,setLeaderboardAspect]=useState(941/1672)
+  const landscapeLeaderboard=leaderboardAspect>1
   const playVideo=()=>{
     const video=videoRef.current
     if(!video)return
@@ -37,7 +39,7 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
     {ready ? <video key={demo==='sharing'?galleryReplay:'clip'} ref={videoRef} src={content.src} poster={content.poster} autoPlay muted playsInline loop={content.loop??true} preload="auto" aria-label={content.label} onLoadedData={playVideo} onPlay={()=>setNeedsPlay(false)} onVolumeChange={event=>{event.currentTarget.muted=true}}/> : <img src={content.poster} alt=""/>}
     {needsPlay&&<button className="video-play-button" onClick={playVideo}>Play video <span aria-hidden="true">▶</span></button>}
   </>
-  return <motion.aside className={`kiosk-video-panel ${demo==='sharing'?'sharing-outfit-panel':''} ${showLeaderboard?'leaderboard-panel':''} ${demo==='scan'&&!showGallery?'has-nfc-sticker':''}`} aria-labelledby={titleId} initial={reduced?{opacity:0,y:'-50%'}:{opacity:0,x:45,y:'-50%',scale:.94}} animate={{opacity:1,x:0,y:'-50%',scale:1}} transition={{duration:reduced?.1:.38,type:'spring',bounce:.15}} exit={{opacity:0,x:15}} onAnimationComplete={()=>setReady(true)}>
+  return <motion.aside className={`kiosk-video-panel ${demo==='sharing'?'sharing-outfit-panel':''} ${showLeaderboard?'leaderboard-panel':''} ${showLeaderboard&&landscapeLeaderboard?'landscape-leaderboard-panel':''} ${demo==='scan'&&!showGallery?'has-nfc-sticker':''}`} style={{'--leaderboard-aspect':leaderboardAspect,'--leaderboard-frame-aspect':landscapeLeaderboard?leaderboardAspect:1}} aria-labelledby={titleId} initial={reduced?{opacity:0,y:'-50%'}:{opacity:0,x:45,y:'-50%',scale:.94}} animate={{opacity:1,x:0,y:'-50%',scale:1}} transition={{duration:reduced?.1:.38,type:'spring',bounce:.15}} exit={{opacity:0,x:15}} onAnimationComplete={()=>setReady(true)}>
     <AnimatePresence>
       {demo==='scan'&&!showGallery&&<motion.div className="nfc-sticker-group" key="nfc-phone" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced?0:.18}}>
         <span className="nfc-sticker-label">NFC tag<svg viewBox="0 0 45 25" fill="none" aria-hidden="true"><path d="M3 7C14 2 25 3 37 17M28 16l10 2-2-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
@@ -50,11 +52,11 @@ export default function KioskVideoPanel({demo='proficiency',showGallery=false,sh
     <div className={`proficiency-video-frame ${demo==='sharing'?'sharing-outfit-frame':''}`}>
       <AnimatePresence mode="wait" initial={false}>
         {showGallery ? <ScanResultGallery key={`gallery-${galleryReplay}`}/> : showLeaderboard ? <motion.div key="leaderboard" className="sharing-leaderboard" initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:reduced?0:.32,ease:[.22,.7,.2,1]}}>
-          <figure className="sharing-leaderboard-card"><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge community leaderboard, with Emma’s Duo outfit in first place"/><span className="winner-outfit-origin" aria-hidden="true"/></figure>
+          <figure className="sharing-leaderboard-card" data-layout={landscapeLeaderboard?'landscape':'portrait'}><img src="/sharing-fashion-challenge.png" alt="Paris Fashion Challenge community leaderboard, with Emma’s Duo outfit in first place" onLoad={event=>{const image=event.currentTarget;if(image.naturalWidth&&image.naturalHeight)setLeaderboardAspect(image.naturalWidth/image.naturalHeight)}}/><span className="winner-outfit-origin" aria-hidden="true"/></figure>
         </motion.div> : <motion.div key="video" className="scan-video-content" initial={{opacity:0}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:.96}} transition={{duration:reduced?0:.22}}>
           {demo==='sharing' ? <div className="sharing-outfit-media">
             <div className="sharing-video-card">{videoContent}</div>
-            {[{src:'/save-outfit/translation.png',alt:'Camille in a French translation exercise: C’est bien !'},{src:'/save-outfit/learning-path.png',alt:'Camille on the Duolingo learning path in Section 4, Unit 32: Talk about the future',dark:true}].map((image,index)=><motion.figure key={image.src} className={`sharing-image-card ${image.dark?'sharing-image-dark':''}`} initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.12+index*.1,duration:.4,type:'spring',bounce:.2}}><img src={image.src} alt={image.alt}/></motion.figure>)}
+            {[{src:'/save-outfit/translation-red-outfit.png',alt:'Camille wearing a red coat, black beret and blue jeans in a French translation exercise: C’est bien !'},{src:'/save-outfit/learning-path-red-outfit.png',alt:'Camille wearing a red coat, black beret and blue jeans on the Duolingo learning path in Section 4, Unit 32: Talk about the future',dark:true}].map((image,index)=><motion.figure key={image.src} className={`sharing-image-card ${image.dark?'sharing-image-dark':''}`} initial={reduced?false:{opacity:0,y:18,scale:.95}} animate={{opacity:1,y:0,scale:1}} transition={{delay:reduced?0:.12+index*.1,duration:.4,type:'spring',bounce:.2}}><img src={image.src} alt={image.alt}/></motion.figure>)}
           </div> : videoContent}
         </motion.div>}
       </AnimatePresence>
