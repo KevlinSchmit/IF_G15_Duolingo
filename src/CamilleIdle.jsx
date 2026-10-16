@@ -24,7 +24,7 @@ const routine=[
 const times=routine.map(frame=>frame.time)
 const expressions=[{name:'neutral',duration:1600},{name:'wink',duration:650},{name:'neutral',duration:3800},{name:'relaxed',duration:2700},{name:'neutral',duration:3600},{name:'wink',duration:650},{name:'neutral',duration:1000}]
 
-export default function CamilleIdle({active=true}) {
+export default function CamilleIdle({active=true,portrait=false}) {
   const reduced=useReducedMotion()
   const id=useId().replaceAll(':','')
   const [expression,setExpression]=useState('neutral')
@@ -41,11 +41,13 @@ export default function CamilleIdle({active=true}) {
   const moving=active&&!reduced
   const face=moving?expression:'neutral'
   return <div className="camille-idle" data-pose={face} role="img" aria-label="Camille waves, rests her hands on her hips, presents the installation and shrugs">
-    <svg className="camille-puppet" viewBox="0 0 1024 1490" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+    <svg className="camille-puppet" viewBox={portrait?'210 70 640 640':'0 0 1024 1490'} preserveAspectRatio={portrait?'xMidYMid meet':'xMidYMax meet'} aria-hidden="true">
       <defs>
         <linearGradient id={`${id}-sleeve`} x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fffdfa"/><stop offset=".7" stopColor="#fffaf5"/><stop offset="1" stopColor="#faf5ed"/></linearGradient>
         <linearGradient id={`${id}-hand`} x2=".8" y2="1"><stop stopColor="#fbd6aa"/><stop offset="1" stopColor="#f1c18f"/></linearGradient>
         <clipPath id={`${id}-eyes`}><ellipse cx="485" cy="328" rx="68" ry="65"/><ellipse cx="617" cy="344" rx="65" ry="58"/></clipPath>
+        <clipPath id={`${id}-blink-left`}><path d="m424 304 120 12c8 50-26 69-55 65-41-2-63-29-65-77Z"/></clipPath>
+        <clipPath id={`${id}-blink-right`}><path d="m553 326 121 13c-2 49-35 61-62 58-37-3-60-30-59-71Z"/></clipPath>
       </defs>
       <RigMotion type="translate" className="camille-body-lift" values={routine.map(frame=>[0,frame.lift])} times={times} enabled={moving}>
         <g transform="translate(550 1455)">
@@ -58,6 +60,8 @@ export default function CamilleIdle({active=true}) {
                 <image className="camille-expression" data-expression="relaxed" href="/camille-idle-relaxed.png" width="1024" height="1536" style={{opacity:face==='relaxed'?1:0,transition:reduced?'none':'opacity .18s ease-in-out'}}/>
                 <image className="camille-expression" data-expression="wink" href="/camille-idle-wink.png" width="1024" height="1536" style={{opacity:face==='wink'?1:0,transition:reduced?'none':'opacity .12s ease-in-out'}}/>
               </g>
+              <g clipPath={`url(#${id}-blink-left)`}><rect className="camille-blink-curtain" x="415" y="300" width="140" height="100" fill="#f1a474"/></g>
+              <g clipPath={`url(#${id}-blink-right)`}><rect className="camille-blink-curtain" x="545" y="325" width="140" height="85" fill="#f1a474"/></g>
             </g>
           </RigMotion>
         </g>

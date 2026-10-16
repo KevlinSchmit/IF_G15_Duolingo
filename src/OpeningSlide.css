@@ -1,0 +1,26 @@
+.opening-copy{width:76%;max-width:1020px;padding-bottom:30px}
+.profile-page .opening-copy h1{font-size:clamp(56px,6.4vw,104px);line-height:1.05;margin-bottom:28px;text-wrap:balance}
+.opening-copy h1 .opening-title-brand{display:block;color:#fff;margin-bottom:.1em}
+.opening-subtitles h2{font-size:clamp(26px,2.6vw,38px);margin-bottom:16px}
+.opening-subtitles p{font-size:clamp(16px,1.4vw,21px);line-height:1.6;max-width:min(760px,100%,calc(100vw - clamp(230px,27vw,380px) - 16vw))}
+.opening-member{white-space:nowrap}
+.tower-card,.age-sticker{border:0}
+.tower-card{padding:16px 20px 18px}
+.portrait-puppet{position:absolute;inset:0;overflow:hidden;background:#fff7e8}
+.camille-blink-curtain{transform-box:fill-box;transform-origin:center top;transform:scaleY(0)}
+.camille-transform-actor{transform-origin:50% 50%}
+@media(max-width:750px){
+  .opening-scene{padding-top:45px}
+  .opening-copy{width:100%;max-width:560px;padding:0}
+  .profile-page .opening-copy h1{font-size:clamp(40px,9.7vw,68px);margin-bottom:22px}
+  .opening-subtitles h2{font-size:25px;margin-bottom:10px}
+  .opening-subtitles p{font-size:14px;line-height:1.55;max-width:430px}
+  .tower-card{padding:10px 12px 13px}
+}
+@media(max-width:750px) and (max-height:720px){
+  .opening-scene{padding-top:25px}
+  .profile-page .opening-copy h1{font-size:38px;margin-bottom:18px}
+  .opening-subtitles h2{font-size:22px}
+  .opening-subtitles p{font-size:13px;line-height:1.5}
+  .opening-duo{width:180px;bottom:8px}
+}

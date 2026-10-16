@@ -1,16 +1,23 @@
 import { useEffect, useRef } from 'react'
-import { useAnimate } from 'motion/react'
+import { animate as animateValue, useAnimate } from 'motion/react'
 import CamilleIdle from './CamilleIdle'
 
+const portraitView=[210,70,640,640]
+const fullBodyView=[0,0,1024,1490]
+const ease=[.22,.7,.2,1]
+
 export default function CamilleTransformation({origin,portraitRef,onReveal,onComplete}) {
-  const [scope,animate] = useAnimate()
+  const [scope,animate]=useAnimate()
   const callbacks=useRef({onReveal,onComplete})
   useEffect(()=>{callbacks.current={onReveal,onComplete}},[onReveal,onComplete])
   useEffect(()=>{
     let cancelled=false
     const controls=[]
+    const pauses=[]
     const portrait=portraitRef.current
     const local=selector=>portrait.querySelector(selector)
+    const puppet=local('.portrait-puppet')
+    const source=puppet.querySelector('svg')
     const move=async(target,values,options)=>{
       if(cancelled)return
       const control=animate(target,values,options)
@@ -18,26 +25,47 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       await control
     }
     const phase=name=>{if(!cancelled)scope.current.dataset.phase=name}
+    const pause=milliseconds=>new Promise(resolve=>{
+      const timer=setTimeout(resolve,milliseconds)
+      pauses.push(()=>{clearTimeout(timer);resolve()})
+    })
     const run=async()=>{
-      // All shoulder portraits and the flash live inside the original photo window.
+      // Decode before the flash so the first cartoon frame is fully drawn.
+      const image=new Image()
+      image.src='/camille-animation-body.png'
+      await image.decode().catch(()=>{})
+      if(cancelled)return
       await Promise.all([
-        move(local('.portrait-flash'),{opacity:[0,1,1,0]},{duration:.32,times:[0,.25,.45,1]}),
-        move(local('.portrait-neutral'),{opacity:1},{delay:.1,duration:.08}),
-        move(local('.portrait-real'),{opacity:0},{delay:.14,duration:.08}),
-        // The first visible cartoon portrait is already blinking in the same frame.
-        move(local('.portrait-wink'),{opacity:1},{delay:.1,duration:.08}),
+        move(local('.portrait-flash'),{opacity:[0,1,1,0]},{duration:.28,times:[0,.25,.42,1]}),
+        move(puppet,{opacity:1},{delay:.09,duration:.12}),
+        move(local('.portrait-real'),{opacity:0},{delay:.1,duration:.1}),
       ])
       if(cancelled)return
-      phase('expression')
-      await move(local('.portrait-wink'),{opacity:0},{duration:.16})
-      // Leave a readable shoulder portrait before the full-body reveal.
-      await move(local('.portrait-neutral'),{scale:[1,1.015,1]},{duration:.2,ease:'easeInOut'})
+      // A readable open-eyed portrait precedes the blink, in the original frame.
+      phase('portrait')
+      await pause(200)
+      if(cancelled)return
+      phase('blink')
+      await move(puppet.querySelectorAll('.camille-blink-curtain'),{scaleY:[0,1,1,0]},{duration:.3,times:[0,.38,.56,1],ease:'easeInOut'})
+      if(cancelled)return
+      phase('fullbody')
+      // Pull back the camera on this same SVG; no second portrait or crossfade.
+      const camera=animateValue(0,1,{
+        duration:.46,ease,
+        onUpdate:progress=>source.setAttribute('viewBox',portraitView.map((value,index)=>value+(fullBodyView[index]-value)*progress).join(' ')),
+      })
+      controls.push(camera)
+      await camera
+      if(cancelled)return
+      await pause(120)
       if(cancelled)return
       phase('jump')
-      await Promise.all([
-        move(local('.portrait-neutral'),{opacity:0},{duration:.14}),
-        move('.camille-transform-actor',{opacity:1,y:-45,height:origin.height*1.55,scale:1.02,rotate:2},{duration:.25,ease:[.2,.7,.25,1]}),
-      ])
+      // Match the original window's unrotated dimensions and its -5° angle.
+      // Both renders now have the same camera and pose, so this handoff is invisible.
+      const actor=scope.current.querySelector('.camille-transform-actor')
+      actor.style.opacity='1'
+      puppet.style.opacity='0'
+      await move(actor,{y:-26,scale:1.045,rotate:-2},{duration:.2,ease})
       if(cancelled)return
       callbacks.current.onReveal()
       let destination=document.querySelector('.adventure-character')
@@ -45,12 +73,22 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       if(cancelled)return
       const stage=destination.getBoundingClientRect()
       phase('land')
-      await move('.camille-transform-actor',{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.42,ease:[.32,0,.22,1]})
-      await move('.camille-transform-actor',{scaleY:[1,.97,1],y:[stage.top-origin.top,stage.top-origin.top+3,stage.top-origin.top]},{duration:.1})
+      await move(actor,{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.5,ease:[.32,0,.22,1]})
+      await move(actor,{scaleY:[1,.98,1],y:[stage.top-origin.top,stage.top-origin.top+3,stage.top-origin.top]},{duration:.12})
       if(!cancelled)callbacks.current.onComplete()
     }
     run()
-    return()=>{cancelled=true;controls.forEach(control=>control.stop())}
+    return()=>{
+      cancelled=true
+      controls.forEach(control=>control.stop())
+      pauses.forEach(cancel=>cancel())
+      if(portrait.isConnected){
+        source.setAttribute('viewBox',portraitView.join(' '))
+        puppet.style.opacity='0'
+        local('.portrait-real').style.opacity='1'
+        local('.portrait-flash').style.opacity='0'
+      }
+    }
   },[animate,origin,portraitRef,scope])
-  return <div ref={scope} className="camille-transform" data-phase="flash" aria-hidden="true"><div className="camille-transform-actor" style={{left:origin.left,top:origin.top,width:origin.width,height:origin.height,opacity:0}}><CamilleIdle active={false}/></div></div>
+  return <div ref={scope} className="camille-transform" data-phase="flash" aria-hidden="true"><div className="camille-transform-actor" style={{left:origin.left,top:origin.top,width:origin.width,height:origin.height,opacity:0,transform:`rotate(${origin.rotate}deg)`}}><CamilleIdle active={false}/></div></div>
 }

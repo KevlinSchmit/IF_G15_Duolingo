@@ -7,6 +7,7 @@ import './index.css'
 import App from './App.jsx'
 import './typography.css'
 import './PresentationLayout.css'
+import './OpeningSlide.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -5,6 +5,7 @@ import FrenchDuo from './FrenchDuo'
 import SceneTransition from './SceneTransition'
 import AdventureScene from './AdventureScene'
 import CamilleTransformation from './CamilleTransformation'
+import CamilleIdle from './CamilleIdle'
 import OutfitZoom from './OutfitZoom'
 import DiscoveryPoster from './DiscoveryPoster'
 import { Flowers, Sunglasses, Scarf, Tower } from './FrenchAccessories'
@@ -17,6 +18,7 @@ function Floating({className, children, delay = 0, rotation = 0, reduced}) {
   </motion.div>
 }
 const tourPages=['tour-kiosks','tour-clothing','tour-duomart','tour-overview']
+const members=['Leanne Wang','Beatrice Madden','Makeda West','Thomas Du','Reagan Sacks']
 const slides=['opening','camille','discovery','adventure',...tourPages,'proficiency','clothing','scan','scan-results','sharing','leaderboard','outfit','learner']
 
 export default function App() {
@@ -48,8 +50,11 @@ export default function App() {
     if (transitionLock.current || page !== 'discovery') return
     if (reduced) {setPage('adventure');return}
     transitionLock.current=true
-    const rect=portraitRef.current.querySelector('.portrait-window').getBoundingClientRect()
-    setTransformOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
+    const portraitWindow=portraitRef.current.querySelector('.portrait-window')
+    const rect=portraitWindow.getBoundingClientRect()
+    const matrix=new DOMMatrix(getComputedStyle(portraitRef.current).transform)
+    const width=portraitWindow.offsetWidth,height=portraitWindow.offsetHeight
+    setTransformOrigin({left:rect.left+(rect.width-width)/2,top:rect.top+(rect.height-height)/2,width,height,rotate:Math.atan2(matrix.b,matrix.a)*180/Math.PI})
   },[page,reduced])
   const startKiosk = useCallback(()=>{if(!transitionLock.current&&(page==='adventure'||tourPages.includes(page)))setPage(slides[slides.indexOf(page)+1])},[page])
   const startClothing=useCallback(()=>{if(!transitionLock.current&&page==='proficiency')setPage('clothing')},[page])
@@ -70,8 +75,8 @@ export default function App() {
     setPage('outfit')
   },[page,reduced])
   useEffect(()=>{
-    const src=page==='camille'?'/installation-discovery-poster.png':page==='leaderboard'?'/duo-winning-outfit.png':null
-    if(src){const image=new Image();image.src=src;image.decode().catch(()=>{})}
+    const sources=page==='camille'?['/installation-discovery-poster.png','/camille-animation-body.png','/paris-adventure-sky.png']:page==='leaderboard'?['/duo-winning-outfit.png']:[]
+    sources.forEach(src=>{const image=new Image();image.src=src;image.decode().catch(()=>{})})
   },[page])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
   const goBack = useCallback(() => {if(!transitionLock.current)setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])}, [])
@@ -114,7 +119,7 @@ export default function App() {
     <header className="masthead"><span className="wordmark">duolingo</span><button className="fullscreen-button" onClick={enterFullscreen} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>⛶</button></header>
     <AnimatePresence mode="wait">
     {page === 'opening' ? <motion.section key="opening" className="opening-scene" aria-label="Opening slide" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : .35}}>
-      <div className="opening-copy"><motion.p className="intro-label" initial={reduced ? false : {opacity:0,y:15}} animate={{opacity:1,y:0}}>BONJOUR !</motion.p><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}>TEXT<span>.</span></motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>text text</h2><p>text text</p></motion.div></div>
+      <div className="opening-copy"><motion.h1 initial={reduced ? false : {opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1,duration:.6}}><span className="opening-title-brand">Duolingo x</span>{' '}French Fashion Challenge</motion.h1><motion.div className="opening-subtitles" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .4}}><h2>Group 15</h2><p>{members.map((name,index)=><span key={name}><span className="opening-member">{name}</span>{index<members.length-1?', ':''}</span>)}</p></motion.div></div>
       <div className="opening-decoration" aria-hidden="true"><Spark/></div>
       <div ref={duoRef} className={`opening-duo ${transitionOrigin ? 'duo-in-transition' : ''}`}><span className="duo-greeting">salut !</span><FrenchDuo/></div>
     </motion.section> : page === 'camille'||page==='discovery' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : transformOrigin ? .16 : .35}}><section className="profile-scene" aria-label={page==='discovery'?'Camille discovers the French-fashion installation':'Meet Camille'}>
@@ -130,7 +135,7 @@ export default function App() {
       <div className="portrait-world">
         <div className="portrait-backdrop"/>
         <motion.div ref={portraitRef} className="portrait-frame" initial={reduced ? false : {opacity:0,scale:.85,rotate:-5}} animate={{opacity:1,scale:1,rotate:-5}} transition={{duration:.8,type:'spring',bounce:.2}}>
-          <div className="portrait-window"><img className="portrait-real" src="/camille-portrait.png" alt="Camille smiling, with brown hair and bangs, wearing a cream sweater"/><img className="portrait-cartoon portrait-neutral" src="/camille-cartoon-portrait.png" alt="" aria-hidden="true"/><img className="portrait-cartoon portrait-wink" src="/camille-cartoon-portrait-wink.png" alt="" aria-hidden="true"/><div className="portrait-flash" aria-hidden="true"/></div>
+          <div className="portrait-window"><img className="portrait-real" src="/camille-portrait.png" alt="Camille smiling, with brown hair and bangs, wearing a cream sweater"/><div className="portrait-cartoon portrait-puppet" aria-hidden="true"><CamilleIdle active={false} portrait/></div><div className="portrait-flash" aria-hidden="true"/></div>
           <div className="photo-caption"><span>c’est Camille !</span><span className="caption-heart">♥</span></div>
         </motion.div>
         <Floating className="outfits-word" delay={.45} rotation={-12} reduced={reduced}>outfits</Floating>
