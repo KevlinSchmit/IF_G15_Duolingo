@@ -57,6 +57,7 @@ export default function App() {
   const reduced = useReducedMotion()
   const [videoReplay,setVideoReplay] = useState(0)
   const [page,setPage] = useState('opening')
+  const [posterImpacted,setPosterImpacted] = useState(false)
   const [transitionOrigin,setTransitionOrigin] = useState(null)
   const duoRef = useRef(null)
   const portraitRef = useRef(null)
@@ -73,6 +74,7 @@ export default function App() {
   }, [page,reduced])
   const startDiscovery=useCallback(()=>{
     if(transitionLock.current||page!=='camille')return
+    setPosterImpacted(false)
     setPage('discovery')
     if(window.matchMedia('(max-width:750px)').matches)window.scrollTo({top:0,behavior:reduced?'instant':'smooth'})
   },[page,reduced])
@@ -97,9 +99,14 @@ export default function App() {
       const rect=source.getBoundingClientRect()
       transitionLock.current=true
       setOutfitOrigin({left:rect.left,top:rect.top,width:rect.width,height:rect.height})
+      return
     }
     setPage('outfit')
   },[page,reduced])
+  useEffect(()=>{
+    const src=page==='camille'?'/installation-discovery-poster.png':page==='leaderboard'?'/duo-winning-outfit.png':null
+    if(src){const image=new Image();image.src=src;image.decode().catch(()=>{})}
+  },[page])
   const startLearner=useCallback(()=>{if(!transitionLock.current&&page==='outfit')setPage('learner')},[page])
   const goBack = useCallback(() => {if(!transitionLock.current)setPage(current=>slides[Math.max(0,slides.indexOf(current)-1)])}, [])
   useEffect(() => {
@@ -146,13 +153,13 @@ export default function App() {
       <div ref={duoRef} className={`opening-duo ${transitionOrigin ? 'duo-in-transition' : ''}`}><span className="duo-greeting">salut !</span><FrenchDuo/></div>
     </motion.section> : page === 'camille'||page==='discovery' ? <motion.div key="camille" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:reduced ? .1 : transformOrigin ? .16 : .35}}><section className="profile-scene" aria-label={page==='discovery'?'Camille discovers the French-fashion installation':'Meet Camille'}>
       <div className="headline-block">
-        <motion.div className="headline-content" aria-hidden={page==='discovery'} animate={{opacity:page==='discovery'?0:1}} transition={{duration:reduced?0:.2}}>
+        <motion.div className="headline-content" aria-hidden={page==='discovery'&&posterImpacted} animate={page==='discovery'&&posterImpacted?{opacity:0,filter:'blur(8px)',y:18,scale:.97}:{opacity:1,filter:'blur(0px)',y:0,scale:1}} transition={{duration:reduced?0:.28}}>
         <motion.p className="intro-label" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:reduced ? 0 : .5}}>SAY BONJOUR TO</motion.p>
         <motion.h1 initial={reduced ? false : {opacity:0,y:35}} animate={{opacity:1,y:0}} transition={{duration:.7,delay:reduced ? 0 : .15}}>meet<br/>Camille<span>.</span></motion.h1>
         <motion.ul className="profile-description profile-facts" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .6}}><li>19-year-old fashion enthusiast</li><li>Dreams of visiting Paris</li><li>Finds traditional vocabulary lessons boring</li></motion.ul>
         <motion.div className="profile-caption" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:reduced ? 0 : .9}}><span className="french-flag"><i/><i/><i/></span><span>Next stop? France.</span></motion.div>
         </motion.div>
-        <AnimatePresence>{page==='discovery'&&<DiscoveryPoster key="discovery-poster" reduced={reduced}/>}</AnimatePresence>
+        <AnimatePresence>{page==='discovery'&&<DiscoveryPoster key="discovery-poster" reduced={reduced} onImpact={()=>setPosterImpacted(true)}/>}</AnimatePresence>
       </div>
       <div className="portrait-world">
         <div className="portrait-backdrop"/>
@@ -175,7 +182,7 @@ export default function App() {
     </AnimatePresence>
     {transitionOrigin && <SceneTransition origin={transitionOrigin} onComplete={()=>{setTransitionOrigin(null);transitionLock.current=false}}/>}
     {transformOrigin && <CamilleTransformation portraitRef={portraitRef} origin={transformOrigin} onReveal={()=>setPage('adventure')} onComplete={()=>{setTransformOrigin(null);transitionLock.current=false}}/>}
-    {outfitOrigin&&<OutfitZoom origin={outfitOrigin} onComplete={()=>{setOutfitOrigin(null);transitionLock.current=false}}/>}
+    {outfitOrigin&&<OutfitZoom origin={outfitOrigin} onReveal={()=>setPage('outfit')} onComplete={()=>{setOutfitOrigin(null);transitionLock.current=false}}/>}
     <footer><button className="back-button" onClick={goBack} disabled={page === 'opening' || !!transitionOrigin || !!transformOrigin || !!outfitOrigin} aria-label="Previous slide">←</button><button disabled={!!transitionOrigin || !!transformOrigin || !!outfitOrigin} onClick={advance} className="replay-button">{page === 'opening' ? 'Click anywhere to begin' : page === 'camille' ? 'Discover the installation' : page==='discovery' ? 'Enter Camille’s world' : page==='adventure' ? 'Explore the kiosks' : page==='tour-kiosks' ? 'Explore the clothing stations' : page==='tour-clothing' ? 'Visit Duomart' : page==='tour-duomart' ? 'Back to the full installation' : page==='tour-overview' ? 'Start Personalized Learning' : page==='proficiency' ? 'Receive a Prompt' : page==='clothing' ? 'Scan and Receive Feedback' : page==='scan' ? 'See scan results' : page==='scan-results' ? 'Save Your Outfit' : page==='sharing' ? 'See the community leaderboard' : page==='leaderboard' ? 'Explore the winning outfit' : page==='outfit' ? 'See Emma’s progress' : 'Replay the labels'} <span aria-hidden="true">{page === 'learner' ? '↻' : '→'}</span></button><span className="page-number">{String(slides.indexOf(page)+1).padStart(2,'0')} <span>/ {slides.length}</span></span></footer>
   </main>
 }
