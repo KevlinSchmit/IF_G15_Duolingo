@@ -16,9 +16,7 @@ export default function InstallationTour({step}) {
       <h2>{content.title}</h2><p>{content.description}</p>
     </motion.div>
     {step==='kiosks'&&<motion.figure className="installation-tour-photo" initial={reduced?false:{opacity:0,scale:.85,y:25,rotate:3}} animate={{opacity:1,scale:1,y:0,rotate:0}} transition={{delay:reduced?0:.65,duration:reduced?0:.48,type:'spring',bounce:.18}}>
-      <svg viewBox="420 325 570 405" role="img" aria-label="Close-up of the three illustrated kiosks from the installation overview: machines 01, 02 and 03">
-        <image href="/paris-adventure-sky.png" width="1600" height="900" preserveAspectRatio="none"/>
-      </svg>
+      <img src="/installation-kiosk-photo.png" alt="Two physical Duolingo kiosks, numbered 01 and 02, showing Duo and Check in and Check out buttons inside the French fashion installation"/>
     </motion.figure>}
   </motion.div>
 }
