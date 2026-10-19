@@ -55,13 +55,13 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       sound('morph',{volume:.8})
       // Pull back the camera on this same SVG; no second portrait or crossfade.
       const camera=animateValue(0,1,{
-        duration:.46,ease,
+        duration:.32,ease,
         onUpdate:progress=>source.setAttribute('viewBox',portraitView.map((value,index)=>value+(fullBodyView[index]-value)*progress).join(' ')),
       })
       controls.push(camera)
       await camera
       if(cancelled)return
-      await pause(120)
+      await pause(40)
       if(cancelled)return
       phase('jump')
       sound('jump',{volume:.75})
@@ -70,7 +70,7 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       const actor=scope.current.querySelector('.camille-transform-actor')
       actor.style.opacity='1'
       puppet.style.opacity='0'
-      await move(actor,{y:-26,scale:1.045,rotate:-2},{duration:.2,ease})
+      await move(actor,{y:-26,scale:1.045,rotate:-2},{duration:.14,ease})
       if(cancelled)return
       callbacks.current.onReveal()
       let destination=document.querySelector('.adventure-character')
@@ -78,10 +78,10 @@ export default function CamilleTransformation({origin,portraitRef,onReveal,onCom
       if(cancelled)return
       const stage=destination.getBoundingClientRect()
       phase('land')
-      await move(actor,{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.5,ease:[.32,0,.22,1]})
+      await move(actor,{x:stage.left-origin.left,y:stage.top-origin.top,width:stage.width,height:stage.height,scale:1,rotate:0},{duration:.3,ease:[.32,0,.22,1]})
       if(cancelled)return
       sound('land',{volume:.7})
-      await move(actor,{scaleY:[1,.98,1],y:[stage.top-origin.top,stage.top-origin.top+3,stage.top-origin.top]},{duration:.12})
+      await move(actor,{scaleY:[1,.98,1],y:[stage.top-origin.top,stage.top-origin.top+3,stage.top-origin.top]},{duration:.1})
       if(!cancelled)callbacks.current.onComplete()
     }
     run()
