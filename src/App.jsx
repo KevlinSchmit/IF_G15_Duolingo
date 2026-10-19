@@ -103,9 +103,20 @@ export default function App() {
   }, [page])
   useEffect(() => {
     const onKey = event => {
-      if (event.target.closest('button')) return
-      if (['ArrowRight','Enter',' '].includes(event.key) && page !== 'thank-you') {event.preventDefault();if (page === 'opening') startJourney();else if(page==='camille')startDiscovery();else if(page==='discovery')startTransformation();else if(page==='adventure'||tourPages.includes(page))startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else if(page==='outfit')startLearner();else if(page==='learner')startWorld();else startThanks()}
-      if (event.key === 'ArrowLeft') goBack()
+      if (event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return
+      const target=event.target instanceof Element?event.target:null
+      if(target?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])'))return
+      if(!['ArrowRight','ArrowLeft','Enter',' '].includes(event.key))return
+      const control=target?.closest('button, a, [role="button"]')
+      const arrow=event.key==='ArrowRight'||event.key==='ArrowLeft'
+      // Fullscreen keeps focus on its button. Arrows still navigate, and Space
+      // advances rather than clicking that button and leaving fullscreen.
+      // Other controls keep their native Enter/Space activation.
+      if(control&&!arrow&&!(event.key===' '&&control.matches('.fullscreen-button')))return
+      event.preventDefault()
+      if(event.repeat)return
+      if(event.key==='ArrowLeft'){goBack();return}
+      if(page !== 'thank-you') {if (page === 'opening') startJourney();else if(page==='camille')startDiscovery();else if(page==='discovery')startTransformation();else if(page==='adventure'||tourPages.includes(page))startKiosk();else if(page==='proficiency')startClothing();else if(page==='clothing')startScan();else if(page==='scan')startScanResults();else if(page==='scan-results')startSharing();else if(page==='sharing')startLeaderboard();else if(page==='leaderboard')startOutfit();else if(page==='outfit')startLearner();else if(page==='learner')startWorld();else startThanks()}
     }
     window.addEventListener('keydown',onKey)
     return () => window.removeEventListener('keydown',onKey)
